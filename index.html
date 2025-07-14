@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BUP CGPA Calculator</title>
-	<link rel="icon" type="image/x-icon" href="buplogo.png">
     <style>
         * {
             margin: 0;
@@ -36,19 +35,6 @@
             to { transform: translateY(0); opacity: 1; }
         }
 
-        .header img {
-            max-width: 150px;
-            height: auto;
-            margin-bottom: 15px;
-            border-radius: 50%;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease;
-        }
-
-        .header img:hover {
-            transform: scale(1.05) rotate(5deg);
-        }
-
         .header h1 {
             color: #fff;
             margin: 0;
@@ -72,7 +58,7 @@
             padding: 30px;
             border-radius: 20px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
-            max-width: 800px;
+            max-width: 900px;
             margin: auto;
             border: 1px solid rgba(255, 255, 255, 0.2);
             animation: slideInUp 0.8s ease-out 0.2s both;
@@ -83,7 +69,7 @@
             to { transform: translateY(0); opacity: 1; }
         }
 
-        h3 {
+        .section-title {
             text-align: center;
             color: #2c3e50;
             margin: 30px 0 20px 0;
@@ -93,7 +79,7 @@
             padding-bottom: 10px;
         }
 
-        h3::after {
+        .section-title::after {
             content: '';
             position: absolute;
             bottom: 0;
@@ -112,12 +98,6 @@
             margin-bottom: 25px;
             border-left: 5px solid #667eea;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
-            animation: slideInRight 0.6s ease-out 0.4s both;
-        }
-
-        @keyframes slideInRight {
-            from { transform: translateX(100px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
         }
 
         .info-section p {
@@ -126,133 +106,268 @@
             font-weight: 500;
         }
 
-        .input-group {
-            margin-bottom: 20px;
-            animation: slideInLeft 0.6s ease-out var(--delay, 0.6s) both;
-        }
-
-        @keyframes slideInLeft {
-            from { transform: translateX(-50px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-
-        .input-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #34495e;
-            font-size: 1.1em;
-        }
-
-        .input-group input[type="number"] {
+        .grading-table {
             width: 100%;
-            padding: 15px;
-            border: 2px solid #e0e6ed;
-            border-radius: 12px;
-            font-size: 16px;
-            transition: all 0.3s ease;
-            background: #f8f9fa;
+            border-collapse: collapse;
+            margin: 20px 0;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
         }
 
-        .input-group input[type="number"]:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-            background: #fff;
-            transform: translateY(-2px);
+        .grading-table th, .grading-table td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid #e0e6ed;
         }
+
+        .grading-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.9em;
+        }
+
+        .grading-table tbody tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        .grading-table tbody tr:hover {
+            background-color: #e3f2fd;
+            transform: translateX(3px);
+            transition: all 0.3s ease;
+        }
+
+        .marks-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .input-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            border: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .input-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Color coding for different sections */
+        .ct-card {
+            border-color: #ff6b6b;
+            background: linear-gradient(135deg, #ffe0e0 0%, #fff5f5 100%);
+        }
+
+        .ct-card:hover {
+            border-color: #ff5252;
+        }
+
+        .mid-card {
+            border-color: #4ecdc4;
+            background: linear-gradient(135deg, #e0f7fa 0%, #f0fdff 100%);
+        }
+
+        .mid-card:hover {
+            border-color: #26c6da;
+        }
+
+        .assignment-card {
+            border-color: #45b7d1;
+            background: linear-gradient(135deg, #e1f5fe 0%, #f0f9ff 100%);
+        }
+
+        .assignment-card:hover {
+            border-color: #29b6f6;
+        }
+
+        .project-card {
+            border-color: #96ceb4;
+            background: linear-gradient(135deg, #e8f5e8 0%, #f3faf3 100%);
+        }
+
+        .project-card:hover {
+            border-color: #66bb6a;
+        }
+
+        .attendance-card {
+            border-color: #feca57;
+            background: linear-gradient(135deg, #fff8e1 0%, #fffbf0 100%);
+        }
+
+        .attendance-card:hover {
+            border-color: #ffb300;
+        }
+
+        .gpa-card {
+            border-color: #a855f7;
+            background: linear-gradient(135deg, #f3e8ff 0%, #faf5ff 100%);
+        }
+
+        .gpa-card:hover {
+            border-color: #9333ea;
+        }
+
+        .card-title {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .ct-icon { background: #ff6b6b; }
+        .mid-icon { background: #4ecdc4; }
+        .assignment-icon { background: #45b7d1; }
+        .project-icon { background: #96ceb4; }
+        .attendance-icon { background: #feca57; }
+        .gpa-icon { background: #a855f7; }
 
         .ct-row {
             display: flex;
             align-items: center;
-            gap: 15px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            animation: slideInLeft 0.6s ease-out var(--delay, 0.6s) both;
+            gap: 10px;
+            margin-bottom: 15px;
         }
 
-        .ct-row label {
-            flex-basis: 100%;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #34495e;
-            font-size: 1.1em;
-        }
-
-        .ct-row .ct-input-wrapper {
+        .ct-input-wrapper {
             display: flex;
             align-items: center;
-            flex-grow: 1;
-            gap: 10px;
+            gap: 8px;
             background: #f8f9fa;
-            padding: 10px;
-            border-radius: 12px;
+            padding: 8px 12px;
+            border-radius: 10px;
             border: 2px solid #e0e6ed;
             transition: all 0.3s ease;
+            flex-grow: 1;
         }
 
-        .ct-row .ct-input-wrapper:focus-within {
+        .ct-input-wrapper:focus-within {
+            border-color: #ff6b6b;
+            box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.1);
+            background: #fff;
+        }
+
+        .ct-input-wrapper input {
+            border: none;
+            background: transparent;
+            padding: 4px;
+            font-size: 14px;
+            color: #2c3e50;
+            text-align: center;
+            width: 60px;
+        }
+
+        .ct-input-wrapper input:focus {
+            outline: none;
+        }
+
+        .ct-input-wrapper span {
+            color: #7f8c8d;
+            font-weight: 500;
+            font-size: 0.85em;
+        }
+
+        .ct-label {
+            font-weight: 500;
+            color: #2c3e50;
+            min-width: 80px;
+            font-size: 0.9em;
+        }
+
+        .single-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e6ed;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .single-input:focus {
+            outline: none;
             border-color: #667eea;
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
             background: #fff;
         }
 
-        .ct-row .ct-input-wrapper input {
-            flex-grow: 1;
-            border: none;
-            background: transparent;
-            padding: 5px;
-            font-size: 16px;
-            color: #2c3e50;
-        }
-
-        .ct-row .ct-input-wrapper input:focus {
-            outline: none;
-        }
-
-        .ct-row .ct-input-wrapper span {
+        .input-hint {
             color: #7f8c8d;
-            font-weight: 500;
-            font-size: 0.9em;
+            font-size: 0.8em;
+            margin-top: 5px;
         }
 
-        button {
-            display: block;
-            width: 100%;
-            padding: 18px;
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-            color: white;
+        .button-container {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            flex: 1;
+            min-width: 200px;
+            padding: 15px;
             border: none;
-            border-radius: 15px;
-            font-size: 18px;
+            border-radius: 12px;
+            font-size: 16px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
-            margin-top: 30px;
-            box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3);
             text-transform: uppercase;
             letter-spacing: 1px;
-            animation: pulse 2s infinite;
+            position: relative;
+            overflow: hidden;
         }
 
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.02); }
+        .btn-primary {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3);
         }
 
-        button:hover {
-            transform: translateY(-3px);
+        .btn-primary:hover {
+            transform: translateY(-2px);
             box-shadow: 0 12px 35px rgba(40, 167, 69, 0.4);
-            background: linear-gradient(135deg, #218838 0%, #1ea085 100%);
         }
 
-        button:active {
-            transform: translateY(-1px);
+        .btn-secondary {
+            background: linear-gradient(135deg, #6f42c1 0%, #e83e8c 100%);
+            color: white;
+            box-shadow: 0 8px 25px rgba(111, 66, 193, 0.3);
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 35px rgba(111, 66, 193, 0.4);
         }
 
         .result {
             margin-top: 30px;
-            padding: 20px;
+            padding: 25px;
             border-radius: 15px;
             text-align: center;
             font-size: 1.1em;
@@ -274,38 +389,71 @@
             color: #dc3545;
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            border-radius: 15px;
-            overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            animation: slideInUp 0.6s ease-out 0.8s both;
+        .result.success {
+            background: linear-gradient(135deg, #e8f5e8 0%, #f3faf3 100%);
+            border-color: #28a745;
+            color: #155724;
         }
 
-        th, td {
-            padding: 15px;
-            text-align: center;
-            border-bottom: 1px solid #e0e6ed;
-            transition: background-color 0.3s ease;
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
         }
 
-        th {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            cursor: help;
+            color: #667eea;
+            margin-left: 5px;
+        }
+
+        .tooltip::before {
+            content: '?';
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            background: #667eea;
             color: white;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            border-radius: 50%;
+            text-align: center;
+            font-size: 10px;
+            line-height: 16px;
+            font-weight: bold;
         }
 
-        tbody tr:hover {
-            background-color: #f8f9fa;
-            transform: translateX(5px);
+        .tooltip::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s;
+            z-index: 1000;
         }
 
-        tbody tr:nth-child(even) {
-            background-color: #f8f9fa;
+        .tooltip:hover::after {
+            opacity: 1;
+            visibility: visible;
         }
 
         .credit {
@@ -317,7 +465,6 @@
             flex-direction: column;
             align-items: center;
             gap: 15px;
-            animation: slideInUp 0.6s ease-out 1s both;
         }
 
         .credit p {
@@ -326,7 +473,7 @@
             font-weight: 500;
         }
 
-        .linkedin-button {
+        .social-button {
             display: inline-flex;
             align-items: center;
             padding: 12px 25px;
@@ -343,16 +490,9 @@
             box-shadow: 0 8px 25px rgba(24, 119, 242, 0.3);
         }
 
-        .linkedin-button:hover {
+        .social-button:hover {
             transform: translateY(-3px);
             box-shadow: 0 12px 35px rgba(24, 119, 242, 0.4);
-            background: linear-gradient(135deg, #166fe5 0%, #3b96e8 100%);
-        }
-
-        .linkedin-button img {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
         }
 
         /* Responsive Design */
@@ -361,290 +501,183 @@
                 padding: 10px;
             }
             
-            .header {
-                margin-bottom: 20px;
+            .container {
+                padding: 20px;
+                border-radius: 15px;
             }
             
             .header h1 {
-                font-size: 1.8em;
-                line-height: 1.2;
+                font-size: 2em;
             }
             
             .header h2 {
-                font-size: 1.3em;
-                line-height: 1.2;
+                font-size: 1.4em;
             }
             
-            .header img {
-                max-width: 100px;
-                margin-bottom: 10px;
+            .marks-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
             }
             
-            .container {
-                padding: 20px 15px;
-                margin: 0;
-                border-radius: 15px;
-                max-width: 100%;
-            }
-            
-            h3 {
-                font-size: 1.3em;
-                margin: 20px 0 15px 0;
-            }
-            
-            .info-section {
+            .input-card {
                 padding: 15px;
-                margin-bottom: 20px;
-                border-radius: 10px;
             }
             
-            .info-section p {
-                font-size: 0.9em;
-                margin: 6px 0;
+            .button-container {
+                flex-direction: column;
+            }
+            
+            .btn {
+                min-width: auto;
             }
             
             .ct-row {
                 flex-direction: column;
                 align-items: stretch;
-                margin-bottom: 15px;
-            }
-            
-            .ct-row label {
-                font-size: 1em;
-                margin-bottom: 6px;
-            }
-            
-            .ct-row .ct-input-wrapper {
-                width: 100%;
-                padding: 8px;
-                border-radius: 8px;
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-            
-            .ct-row .ct-input-wrapper input {
-                padding: 8px;
-                font-size: 14px;
-                min-width: 60px;
-                text-align: center;
-            }
-            
-            .ct-row .ct-input-wrapper span {
-                font-size: 0.8em;
-                margin: 0 5px;
-            }
-            
-            .input-group {
-                margin-bottom: 15px;
-            }
-            
-            .input-group label {
-                font-size: 1em;
-                margin-bottom: 6px;
-            }
-            
-            .input-group input[type="number"] {
-                padding: 12px;
-                font-size: 14px;
-                border-radius: 8px;
-            }
-            
-            button {
-                padding: 15px;
-                font-size: 16px;
-                border-radius: 10px;
-                margin-top: 20px;
-            }
-            
-            .result {
-                padding: 15px;
-                font-size: 1em;
-                border-radius: 10px;
-                margin-top: 20px;
-            }
-            
-            table {
-                font-size: 0.85em;
-                border-radius: 10px;
-            }
-            
-            th, td {
-                padding: 10px 8px;
-            }
-            
-            th {
-                font-size: 0.8em;
-            }
-            
-            .credit {
-                margin-top: 30px;
-                padding: 15px;
-                gap: 12px;
-            }
-            
-            .credit p {
-                font-size: 1em;
-            }
-            
-            .linkedin-button {
-                padding: 10px 20px;
-                font-size: 0.9em;
-                border-radius: 20px;
-            }
-            
-            .linkedin-button img {
-                width: 18px;
-                height: 18px;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .header h1 {
-                font-size: 1.5em;
-            }
-            
-            .header h2 {
-                font-size: 1.1em;
-            }
-            
-            .container {
-                padding: 15px 10px;
-                border-radius: 10px;
-            }
-            
-            h3 {
-                font-size: 1.2em;
-            }
-            
-            .ct-row .ct-input-wrapper {
-                padding: 6px;
-                gap: 5px;
-            }
-            
-            .ct-row .ct-input-wrapper input {
-                padding: 6px;
-                font-size: 13px;
-                min-width: 50px;
-            }
-            
-            .input-group input[type="number"] {
-                padding: 10px;
-                font-size: 13px;
-            }
-            
-            button {
-                padding: 12px;
-                font-size: 14px;
-            }
-            
-            table {
-                font-size: 0.75em;
-            }
-            
-            th, td {
-                padding: 8px 6px;
-            }
-            
-            .result {
-                padding: 12px;
-                font-size: 0.9em;
-            }
-            
-            .linkedin-button {
-                padding: 8px 16px;
-                font-size: 0.8em;
-            }
-        }
-        
-        @media (max-width: 360px) {
-            .header h1 {
-                font-size: 1.3em;
-            }
-            
-            .header h2 {
-                font-size: 1em;
-            }
-            
-            .container {
-                padding: 12px 8px;
-            }
-            
-            h3 {
-                font-size: 1.1em;
-            }
-            
-            .ct-row .ct-input-wrapper {
-                flex-direction: column;
-                align-items: stretch;
                 gap: 8px;
             }
             
-            .ct-row .ct-input-wrapper input {
-                width: 100%;
+            .ct-label {
+                min-width: auto;
                 text-align: center;
             }
             
-            .ct-row .ct-input-wrapper span {
+            .grading-table {
+                font-size: 0.9em;
+            }
+            
+            .grading-table th, .grading-table td {
+                padding: 8px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.6em;
+            }
+            
+            .header h2 {
+                font-size: 1.2em;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+            
+            .input-card {
+                padding: 12px;
+            }
+            
+            .ct-input-wrapper {
+                flex-direction: column;
+                gap: 5px;
                 text-align: center;
-                font-size: 0.7em;
             }
             
-            table {
-                font-size: 0.7em;
+            .ct-input-wrapper input {
+                width: 80px;
             }
             
-            th, td {
-                padding: 6px 4px;
+            .grading-table {
+                font-size: 0.8em;
             }
             
-            .result {
-                padding: 10px;
-                font-size: 0.85em;
+            .grading-table th, .grading-table td {
+                padding: 6px;
             }
         }
 
-        /* Loading Animation */
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #667eea;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
+        /* Download popup styles */
+        .download-popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        .download-popup.active {
+            opacity: 1;
+            visibility: visible;
         }
 
-        /* Add staggered animation delays */
-        .ct-row:nth-child(1) { --delay: 0.3s; }
-        .ct-row:nth-child(2) { --delay: 0.4s; }
-        .ct-row:nth-child(3) { --delay: 0.5s; }
-        .ct-row:nth-child(4) { --delay: 0.6s; }
-        .input-group:nth-child(1) { --delay: 0.7s; }
-        .input-group:nth-child(2) { --delay: 0.8s; }
-        .input-group:nth-child(3) { --delay: 0.9s; }
-        .input-group:nth-child(4) { --delay: 1.0s; }
+        .download-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            max-width: 400px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            transform: scale(0.8);
+            transition: transform 0.3s ease;
+        }
+
+        .download-popup.active .download-content {
+            transform: scale(1);
+        }
+
+        .download-content h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        .download-content p {
+            color: #7f8c8d;
+            margin-bottom: 20px;
+        }
+
+        .download-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .download-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .download-btn.confirm {
+            background: #28a745;
+            color: white;
+        }
+
+        .download-btn.cancel {
+            background: #6c757d;
+            color: white;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-2px);
+        }
     </style>
 </head>
 <body>
     <div class="header">
-        <img src="buplogo.png" alt="Bangladesh University of Professionals Logo">
         <h1>Bangladesh University of Professionals</h1>
         <h2>CGPA Calculator</h2>
     </div>
 
     <div class="container">
         <div class="info-section">
-            <p><strong>Weightage:</strong> In-course = 60%, Final Exam = 40%.</p>
-            <p><strong>Class Test Conversion:</strong> Sum of 4 CTs (max 40) is converted to 10 marks.</p>
+            <p><strong>Weightage:</strong> In-course = 60%, Final Exam = 40%</p>
+            <p><strong>Class Test Conversion:</strong> Sum of 4 CTs (max 40) is converted to 10 marks</p>
         </div>
 
-        <h3>Your Grading System</h3>
-        <table>
+        <div class="section-title">Grading System</div>
+        <table class="grading-table">
             <thead>
                 <tr>
                     <th>Class Interval</th>
@@ -666,82 +699,128 @@
             </tbody>
         </table>
         
-        <h3>Enter Your In-Course Marks</h3>
-        <p style="text-align: center; color: #7f8c8d; margin-bottom: 25px; font-style: italic;">
-            <em>For Class Tests, enter your score and the total marks for that CT.</em>
-        </p>
+        <div class="section-title">Enter Your Marks</div>
+        
+        <div class="marks-grid">
+            <!-- Class Tests Card -->
+            <div class="input-card ct-card">
+                <div class="card-title">
+                    <span class="card-icon ct-icon">CT</span>
+                    Class Tests
+                    <span class="tooltip" data-tooltip="Enter your score and total marks for each CT"></span>
+                </div>
+                <div class="ct-row">
+                    <span class="ct-label">CT 1:</span>
+                    <div class="ct-input-wrapper">
+                        <input type="number" id="ct1" min="0" value="0">
+                        <span>out of</span>
+                        <input type="number" id="ct1Max" min="1" value="10">
+                    </div>
+                </div>
+                <div class="ct-row">
+                    <span class="ct-label">CT 2:</span>
+                    <div class="ct-input-wrapper">
+                        <input type="number" id="ct2" min="0" value="0">
+                        <span>out of</span>
+                        <input type="number" id="ct2Max" min="1" value="10">
+                    </div>
+                </div>
+                <div class="ct-row">
+                    <span class="ct-label">CT 3:</span>
+                    <div class="ct-input-wrapper">
+                        <input type="number" id="ct3" min="0" value="0">
+                        <span>out of</span>
+                        <input type="number" id="ct3Max" min="1" value="10">
+                    </div>
+                </div>
+                <div class="ct-row">
+                    <span class="ct-label">CT 4:</span>
+                    <div class="ct-input-wrapper">
+                        <input type="number" id="ct4" min="0" value="0">
+                        <span>out of</span>
+                        <input type="number" id="ct4Max" min="1" value="10">
+                    </div>
+                </div>
+            </div>
 
-        <div class="ct-row">
-            <label for="ct1">Class Test 1 Marks:</label>
-            <div class="ct-input-wrapper">
-                <input type="number" id="ct1" min="0" value="0">
-                <span>out of</span>
-                <input type="number" id="ct1Max" min="1" value="10">
+            <!-- Mid Term Card -->
+            <div class="input-card mid-card">
+                <div class="card-title">
+                    <span class="card-icon mid-icon">MT</span>
+                    Mid Term Exam
+                </div>
+                <input type="number" id="midTerm" min="0" max="20" value="0" class="single-input">
+                <div class="input-hint">Out of 20 marks</div>
+            </div>
+
+            <!-- Assignments Card -->
+            <div class="input-card assignment-card">
+                <div class="card-title">
+                    <span class="card-icon assignment-icon">AS</span>
+                    Assignments & Participation
+                </div>
+                <input type="number" id="assignments" min="0" max="10" value="0" class="single-input">
+                <div class="input-hint">Assignments, Case Study, In-Class Participation (Out of 10)</div>
+            </div>
+
+            <!-- Project Card -->
+            <div class="input-card project-card">
+                <div class="card-title">
+                    <span class="card-icon project-icon">PR</span>
+                    Project/Term Paper
+                </div>
+                <input type="number" id="project" min="0" max="10" value="0" class="single-input">
+                <div class="input-hint">Individual project including presentation (Out of 10)</div>
+            </div>
+
+            <!-- Attendance Card -->
+            <div class="input-card attendance-card">
+                <div class="card-title">
+                    <span class="card-icon attendance-icon">AT</span>
+                    Attendance
+                </div>
+                <input type="number" id="attendance" min="0" max="10" value="0" class="single-input">
+                <div class="input-hint">Out of 10 marks</div>
+            </div>
+
+            <!-- Desired GPA Card -->
+            <div class="input-card gpa-card">
+                <div class="card-title">
+                    <span class="card-icon gpa-icon">GP</span>
+                    Desired GPA
+                </div>
+                <input type="number" id="desiredGpa" min="0.00" max="4.00" step="0.01" value="4.00" class="single-input">
+                <div class="input-hint">Enter target GPA (e.g., 4.00, 3.75, 3.50, etc.)</div>
             </div>
         </div>
-        <div class="ct-row">
-            <label for="ct2">Class Test 2 Marks:</label>
-            <div class="ct-input-wrapper">
-                <input type="number" id="ct2" min="0" value="0">
-                <span>out of</span>
-                <input type="number" id="ct2Max" min="1" value="10">
-            </div>
-        </div>
-        <div class="ct-row">
-            <label for="ct3">Class Test 3 Marks:</label>
-            <div class="ct-input-wrapper">
-                <input type="number" id="ct3" min="0" value="0">
-                <span>out of</span>
-                <input type="number" id="ct3Max" min="1" value="10">
-            </div>
-        </div>
-        <div class="ct-row">
-            <label for="ct4">Class Test 4 Marks:</label>
-            <div class="ct-input-wrapper">
-                <input type="number" id="ct4" min="0" value="0">
-                <span>out of</span>
-                <input type="number" id="ct4Max" min="1" value="10">
-            </div>
-        </div>
 
-        <div class="input-group">
-            <label for="midTerm">Mid Term Marks (out of 20):</label>
-            <input type="number" id="midTerm" min="0" max="20" value="0">
+        <div class="button-container">
+            <button class="btn btn-primary" onclick="calculateRequiredMarks()">Calculate Required Final Marks</button>
+            <button class="btn btn-secondary" onclick="showDownloadPopup()">Download Results as Image</button>
         </div>
-        <div class="input-group">
-            <label for="assignments">Assignments/Case Study/In-Class Participation Marks (out of 10):</label>
-            <input type="number" id="assignments" min="0" max="10" value="0">
-        </div>
-        <div class="input-group">
-            <label for="project">Project Paper/Term Paper (Individual) including Presentation Marks (out of 10):</label>
-            <input type="number" id="project" min="0" max="10" value="0">
-        </div>
-        <div class="input-group">
-            <label for="attendance">Attendance Marks (out of 10):</label>
-            <input type="number" id="attendance" min="0" max="10" value="0">
-        </div>
-
-        <h3>Desired Course GPA</h3>
-        <div class="input-group">
-            <label for="desiredGpa">Enter Your Desired GPA for this Course:</label>
-            <input type="number" id="desiredGpa" min="0.00" max="4.00" step="0.01" value="4.00">
-            <span style="color: #7f8c8d; font-size: 0.9em; margin-top: 5px; display: block;">
-                (e.g., 4.00, 3.75, 3.00, etc.)
-            </span>
-        </div>
-
-        <button onclick="calculateRequiredMarks()">Calculate Required Final Exam Marks</button>
 
         <div id="result" class="result">
-            Enter your marks and desired GPA, then click "Calculate".
+            Enter your marks and desired GPA, then click "Calculate" to see your required final exam score.
         </div>
 
         <div class="credit">
-            <p>Created by <strong>Muztaba Rafid Mahi</strong>.</p>
-            <a href="https://www.facebook.com/Muztaba.Rafid.Mahi" target="_blank" class="linkedin-button">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/2023_Facebook_icon.svg/800px-2023_Facebook_icon.svg.png" alt="Facebook">
+            <p>Created by <strong>Muztaba Rafid Mahi</strong></p>
+            <a href="https://www.facebook.com/Muztaba.Rafid.Mahi" target="_blank" class="social-button">
+                <span>📘</span>
                 Connect on Facebook
             </a>
+        </div>
+    </div>
+
+    <!-- Download Popup -->
+    <div id="downloadPopup" class="download-popup">
+        <div class="download-content">
+            <h3>Download Results</h3>
+            <p>This will capture your calculation results and download them as an image.</p>
+            <div class="download-buttons">
+                <button class="download-btn confirm" onclick="downloadAsImage()">Download</button>
+                <button class="download-btn cancel" onclick="hideDownloadPopup()">Cancel</button>
+            </div>
         </div>
     </div>
 
@@ -757,7 +836,7 @@
             { gpa: 2.50, minPercent: 50 },
             { gpa: 2.25, minPercent: 45 },
             { gpa: 2.00, minPercent: 40 },
-            { gpa: 0.00, minPercent: 0 } // F grade
+            { gpa: 0.00, minPercent: 0 }
         ];
 
         function getMinPercentageForGPA(gpa) {
@@ -766,26 +845,24 @@
                     return gradingScale[i].minPercent;
                 }
             }
-            return null; // GPA not found in the defined scale
+            return null;
         }
 
         function calculateRequiredMarks() {
-            // Add loading animation to button
-            const button = document.querySelector('button');
+            const button = document.querySelector('.btn-primary');
             const originalText = button.innerHTML;
-            button.innerHTML = '<div class="loading"></div> Calculating...';
+            button.innerHTML = '<div class="loading"></div>Calculating...';
             button.disabled = true;
 
-            // Simulate calculation delay for smooth animation
             setTimeout(() => {
                 performCalculation();
                 button.innerHTML = originalText;
                 button.disabled = false;
-            }, 500);
+            }, 800);
         }
 
         function performCalculation() {
-            // Get input values for CTs and their max marks
+            // Get input values
             const ct1 = parseFloat(document.getElementById('ct1').value) || 0;
             const ct1Max = parseFloat(document.getElementById('ct1Max').value) || 10;
             const ct2 = parseFloat(document.getElementById('ct2').value) || 0;
@@ -793,9 +870,11 @@
             const ct3 = parseFloat(document.getElementById('ct3').value) || 0;
             const ct3Max = parseFloat(document.getElementById('ct3Max').value) || 10;
             const ct4 = parseFloat(document.getElementById('ct4').value) || 0;
-            const ct4Max = parseFloat(document.getElementById('ct4Max').value) || 10;
-
-            const midTerm = parseFloat(document.getElementById('midTerm').value) || 0;
+            const ct4Max = parseFloat(document.getElementById('ct4Max').value) || 10
+			
+			
+			
+			const midTerm = parseFloat(document.getElementById('midTerm').value) || 0;
             const assignments = parseFloat(document.getElementById('assignments').value) || 0;
             const project = parseFloat(document.getElementById('project').value) || 0;
             const attendance = parseFloat(document.getElementById('attendance').value) || 0;
@@ -843,25 +922,205 @@
             const requiredFinalExamScoreWeighted = targetTotalMarks - inCourse60Percent;
             let requiredFinalExamMark = requiredFinalExamScoreWeighted / 0.40;
 
-            resultDiv.className = 'result';
+            resultDiv.className = 'result success';
 
             if (requiredFinalExamMark > 100) {
-                resultDiv.innerHTML = `To achieve a GPA of <strong>${desiredGpa.toFixed(2)}</strong> (requiring ${targetMinPercentage}% total), you would need to score <strong>${requiredFinalExamMark.toFixed(2)}</strong> out of 100 in the Final Exam.<br><br>⚠️ It appears challenging or impossible to reach this GPA with your current in-course marks, as the required final exam score exceeds 100%. Consider aiming for a slightly lower GPA or improving future in-course components if possible.`;
+                resultDiv.innerHTML = `
+                    <div style="margin-bottom: 15px;">
+                        <strong>Current In-Course Score:</strong> ${inCourse60Percent.toFixed(2)} / 60<br>
+                        <strong>Required Final Exam Score:</strong> ${requiredFinalExamMark.toFixed(2)} / 100<br>
+                        <strong>Target GPA:</strong> ${desiredGpa.toFixed(2)} (${targetMinPercentage}% total)
+                    </div>
+                    <div style="color: #dc3545; font-weight: bold;">
+                        ⚠️ It appears challenging to reach this GPA with your current in-course marks, as the required final exam score exceeds 100%. 
+                        Consider aiming for a slightly lower GPA or improving future in-course components if possible.
+                    </div>
+                `;
                 resultDiv.className = 'result error';
             } else if (requiredFinalExamMark < 0) {
-                resultDiv.innerHTML = `🎉 Congratulations! You have already secured more than enough marks to achieve a GPA of <strong>${desiredGpa.toFixed(2)}</strong>.<br>You would only need <strong>0</strong> marks in the Final Exam. Your current in-course score is ${inCourse60Percent.toFixed(2)} / 60.`;
+                resultDiv.innerHTML = `
+                    <div style="margin-bottom: 15px;">
+                        <strong>Current In-Course Score:</strong> ${inCourse60Percent.toFixed(2)} / 60<br>
+                        <strong>Required Final Exam Score:</strong> 0 / 100<br>
+                        <strong>Target GPA:</strong> ${desiredGpa.toFixed(2)} (${targetMinPercentage}% total)
+                    </div>
+                    <div style="color: #28a745; font-weight: bold;">
+                        🎉 Congratulations! You have already secured enough marks to achieve a GPA of ${desiredGpa.toFixed(2)}!
+                    </div>
+                `;
             } else {
-                resultDiv.innerHTML = `📊 To achieve a GPA of <strong>${desiredGpa.toFixed(2)}</strong> (requiring ${targetMinPercentage}% total), you need to score <strong>${requiredFinalExamMark.toFixed(2)}</strong> out of 100 in the Final Exam.<br><br>💪 Your current in-course score: ${inCourse60Percent.toFixed(2)} / 60`;
+                resultDiv.innerHTML = `
+                    <div style="margin-bottom: 15px;">
+                        <strong>Current In-Course Score:</strong> ${inCourse60Percent.toFixed(2)} / 60<br>
+                        <strong>Required Final Exam Score:</strong> ${requiredFinalExamMark.toFixed(2)} / 100<br>
+                        <strong>Target GPA:</strong> ${desiredGpa.toFixed(2)} (${targetMinPercentage}% total)
+                    </div>
+                    <div style="color: #155724; font-weight: bold;">
+                        📝 To achieve your desired GPA, you need to score ${requiredFinalExamMark.toFixed(2)} marks out of 100 in the Final Exam.
+                    </div>
+                `;
             }
         }
 
-        // Add smooth scrolling to result
-        function scrollToResult() {
-            document.getElementById('result').scrollIntoView({
-                behavior: 'smooth',
-                block: 'center'
-            });
+        // Download popup functions
+        function showDownloadPopup() {
+            document.getElementById('downloadPopup').classList.add('active');
         }
+
+        function hideDownloadPopup() {
+            document.getElementById('downloadPopup').classList.remove('active');
+        }
+
+        // Download as image function
+        function downloadAsImage() {
+            const resultDiv = document.getElementById('result');
+            
+            if (resultDiv.innerHTML.includes('Enter your marks')) {
+                alert('Please calculate your results first before downloading!');
+                hideDownloadPopup();
+                return;
+            }
+
+            // Create a canvas to draw the result
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Set canvas size
+            canvas.width = 800;
+            canvas.height = 600;
+            
+            // Fill background
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Add gradient background
+            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            gradient.addColorStop(0, '#667eea');
+            gradient.addColorStop(1, '#764ba2');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, 100);
+            
+            // Header
+            ctx.fillStyle = '#ffffff';
+            ctx.font = 'bold 28px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('BUP CGPA Calculator', canvas.width / 2, 40);
+            ctx.font = '20px Arial';
+            ctx.fillText('Calculation Results', canvas.width / 2, 70);
+            
+            // Get input values for display
+            const ct1 = document.getElementById('ct1').value || 0;
+            const ct1Max = document.getElementById('ct1Max').value || 10;
+            const ct2 = document.getElementById('ct2').value || 0;
+            const ct2Max = document.getElementById('ct2Max').value || 10;
+            const ct3 = document.getElementById('ct3').value || 0;
+            const ct3Max = document.getElementById('ct3Max').value || 10;
+            const ct4 = document.getElementById('ct4').value || 0;
+            const ct4Max = document.getElementById('ct4Max').value || 10;
+            const midTerm = document.getElementById('midTerm').value || 0;
+            const assignments = document.getElementById('assignments').value || 0;
+            const project = document.getElementById('project').value || 0;
+            const attendance = document.getElementById('attendance').value || 0;
+            const desiredGpa = document.getElementById('desiredGpa').value;
+            
+            // Input values section
+            ctx.fillStyle = '#2c3e50';
+            ctx.font = 'bold 20px Arial';
+            ctx.textAlign = 'left';
+            ctx.fillText('Input Values:', 50, 150);
+            
+            ctx.font = '16px Arial';
+            let yPos = 180;
+            const lineHeight = 25;
+            
+            ctx.fillText(`CT 1: ${ct1}/${ct1Max}`, 50, yPos);
+            ctx.fillText(`CT 2: ${ct2}/${ct2Max}`, 250, yPos);
+            ctx.fillText(`CT 3: ${ct3}/${ct3Max}`, 450, yPos);
+            ctx.fillText(`CT 4: ${ct4}/${ct4Max}`, 650, yPos);
+            
+            yPos += lineHeight;
+            ctx.fillText(`Mid Term: ${midTerm}/20`, 50, yPos);
+            ctx.fillText(`Assignments: ${assignments}/10`, 250, yPos);
+            
+            yPos += lineHeight;
+            ctx.fillText(`Project: ${project}/10`, 50, yPos);
+            ctx.fillText(`Attendance: ${attendance}/10`, 250, yPos);
+            ctx.fillText(`Desired GPA: ${desiredGpa}`, 450, yPos);
+            
+            // Results section
+            yPos += 50;
+            ctx.fillStyle = '#2c3e50';
+            ctx.font = 'bold 20px Arial';
+            ctx.fillText('Results:', 50, yPos);
+            
+            // Extract result text (simplified)
+            const resultText = resultDiv.textContent || resultDiv.innerText;
+            ctx.font = '16px Arial';
+            ctx.fillStyle = '#333';
+            
+            // Split text into lines
+            const words = resultText.split(' ');
+            let line = '';
+            yPos += 30;
+            
+            for (let i = 0; i < words.length; i++) {
+                const testLine = line + words[i] + ' ';
+                const metrics = ctx.measureText(testLine);
+                const testWidth = metrics.width;
+                
+                if (testWidth > canvas.width - 100 && i > 0) {
+                    ctx.fillText(line, 50, yPos);
+                    line = words[i] + ' ';
+                    yPos += lineHeight;
+                } else {
+                    line = testLine;
+                }
+            }
+            ctx.fillText(line, 50, yPos);
+            
+            // Footer
+            ctx.fillStyle = '#7f8c8d';
+            ctx.font = '14px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('Generated by BUP CGPA Calculator', canvas.width / 2, canvas.height - 30);
+            ctx.fillText(new Date().toLocaleDateString(), canvas.width / 2, canvas.height - 10);
+            
+            // Download the image
+            const link = document.createElement('a');
+            link.download = 'BUP_CGPA_Results.jpg';
+            link.href = canvas.toDataURL('image/jpeg', 0.9);
+            link.click();
+            
+            hideDownloadPopup();
+        }
+
+        // Close popup when clicking outside
+        document.getElementById('downloadPopup').addEventListener('click', function(e) {
+            if (e.target === this) {
+                hideDownloadPopup();
+            }
+        });
+
+        // Add input validation and formatting
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add input event listeners for real-time validation
+            const inputs = document.querySelectorAll('input[type="number"]');
+            inputs.forEach(input => {
+                input.addEventListener('input', function() {
+                    // Remove any existing error styling
+                    this.style.borderColor = '';
+                    
+                    // Add focus styling
+                    this.addEventListener('focus', function() {
+                        this.style.borderColor = '#667eea';
+                    });
+                    
+                    this.addEventListener('blur', function() {
+                        this.style.borderColor = '';
+                    });
+                });
+            });
+        });
     </script>
 </body>
 </html>
