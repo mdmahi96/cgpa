@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BUP CGPA Calculator</title>
+	<link rel="icon" type="image/x-icon" href="buplogo.png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            animation: fadeIn 0.8s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            animation: slideInDown 0.8s ease-out;
+        }
+
+        @keyframes slideInDown {
+            from { transform: translateY(-100px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .header img {
+            max-width: 150px;
+            height: auto;
+            margin-bottom: 15px;
+            border-radius: 50%;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .header img:hover {
+            transform: scale(1.05) rotate(5deg);
+        }
+
+        .header h1 {
+            color: #fff;
+            margin: 0;
+            font-size: 2.5em;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            letter-spacing: 1px;
+        }
+
+        .header h2 {
+            color: #f0f8ff;
+            margin: 10px 0 0 0;
+            font-size: 1.8em;
+            font-weight: 400;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            max-width: 800px;
+            margin: auto;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: slideInUp 0.8s ease-out 0.2s both;
+        }
+
+        @keyframes slideInUp {
+            from { transform: translateY(100px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        h3 {
+            text-align: center;
+            color: #2c3e50;
+            margin: 30px 0 20px 0;
+            font-size: 1.6em;
+            font-weight: 600;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        h3::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 2px;
+        }
+
+        .info-section {
+            background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            border-left: 5px solid #667eea;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            animation: slideInRight 0.6s ease-out 0.4s both;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .info-section p {
+            margin: 8px 0;
+            color: #2c3e50;
+            font-weight: 500;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            animation: slideInLeft 0.6s ease-out var(--delay, 0.6s) both;
+        }
+
+        @keyframes slideInLeft {
+            from { transform: translateX(-50px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #34495e;
+            font-size: 1.1em;
+        }
+
+        .input-group input[type="number"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e6ed;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .input-group input[type="number"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            background: #fff;
+            transform: translateY(-2px);
+        }
+
+        .ct-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            animation: slideInLeft 0.6s ease-out var(--delay, 0.6s) both;
+        }
+
+        .ct-row label {
+            flex-basis: 100%;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #34495e;
+            font-size: 1.1em;
+        }
+
+        .ct-row .ct-input-wrapper {
+            display: flex;
+            align-items: center;
+            flex-grow: 1;
+            gap: 10px;
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 12px;
+            border: 2px solid #e0e6ed;
+            transition: all 0.3s ease;
+        }
+
+        .ct-row .ct-input-wrapper:focus-within {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            background: #fff;
+        }
+
+        .ct-row .ct-input-wrapper input {
+            flex-grow: 1;
+            border: none;
+            background: transparent;
+            padding: 5px;
+            font-size: 16px;
+            color: #2c3e50;
+        }
+
+        .ct-row .ct-input-wrapper input:focus {
+            outline: none;
+        }
+
+        .ct-row .ct-input-wrapper span {
+            color: #7f8c8d;
+            font-weight: 500;
+            font-size: 0.9em;
+        }
+
+        button {
+            display: block;
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 30px;
+            box-shadow: 0 8px 25px rgba(40, 167, 69, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(40, 167, 69, 0.4);
+            background: linear-gradient(135deg, #218838 0%, #1ea085 100%);
+        }
+
+        button:active {
+            transform: translateY(-1px);
+        }
+
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            font-size: 1.1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+            border: 2px solid #667eea;
+            animation: scaleIn 0.5s ease-out;
+        }
+
+        @keyframes scaleIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .result.error {
+            background: linear-gradient(135deg, #ffebee 0%, #fce4ec 100%);
+            border-color: #dc3545;
+            color: #dc3545;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            animation: slideInUp 0.6s ease-out 0.8s both;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: center;
+            border-bottom: 1px solid #e0e6ed;
+            transition: background-color 0.3s ease;
+        }
+
+        th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        tbody tr:hover {
+            background-color: #f8f9fa;
+            transform: translateX(5px);
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        .credit {
+            margin-top: 40px;
+            text-align: center;
+            padding: 20px;
+            border-top: 2px solid #e0e6ed;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            animation: slideInUp 0.6s ease-out 1s both;
+        }
+
+        .credit p {
+            color: #7f8c8d;
+            font-size: 1.1em;
+            font-weight: 500;
+        }
+
+        .linkedin-button {
+            display: inline-flex;
+            align-items: center;
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #1877f2 0%, #42a5f5 100%);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            gap: 10px;
+            box-shadow: 0 8px 25px rgba(24, 119, 242, 0.3);
+        }
+
+        .linkedin-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(24, 119, 242, 0.4);
+            background: linear-gradient(135deg, #166fe5 0%, #3b96e8 100%);
+        }
+
+        .linkedin-button img {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .header {
+                margin-bottom: 20px;
+            }
+            
+            .header h1 {
+                font-size: 1.8em;
+                line-height: 1.2;
+            }
+            
+            .header h2 {
+                font-size: 1.3em;
+                line-height: 1.2;
+            }
+            
+            .header img {
+                max-width: 100px;
+                margin-bottom: 10px;
+            }
+            
+            .container {
+                padding: 20px 15px;
+                margin: 0;
+                border-radius: 15px;
+                max-width: 100%;
+            }
+            
+            h3 {
+                font-size: 1.3em;
+                margin: 20px 0 15px 0;
+            }
+            
+            .info-section {
+                padding: 15px;
+                margin-bottom: 20px;
+                border-radius: 10px;
+            }
+            
+            .info-section p {
+                font-size: 0.9em;
+                margin: 6px 0;
+            }
+            
+            .ct-row {
+                flex-direction: column;
+                align-items: stretch;
+                margin-bottom: 15px;
+            }
+            
+            .ct-row label {
+                font-size: 1em;
+                margin-bottom: 6px;
+            }
+            
+            .ct-row .ct-input-wrapper {
+                width: 100%;
+                padding: 8px;
+                border-radius: 8px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .ct-row .ct-input-wrapper input {
+                padding: 8px;
+                font-size: 14px;
+                min-width: 60px;
+                text-align: center;
+            }
+            
+            .ct-row .ct-input-wrapper span {
+                font-size: 0.8em;
+                margin: 0 5px;
+            }
+            
+            .input-group {
+                margin-bottom: 15px;
+            }
+            
+            .input-group label {
+                font-size: 1em;
+                margin-bottom: 6px;
+            }
+            
+            .input-group input[type="number"] {
+                padding: 12px;
+                font-size: 14px;
+                border-radius: 8px;
+            }
+            
+            button {
+                padding: 15px;
+                font-size: 16px;
+                border-radius: 10px;
+                margin-top: 20px;
+            }
+            
+            .result {
+                padding: 15px;
+                font-size: 1em;
+                border-radius: 10px;
+                margin-top: 20px;
+            }
+            
+            table {
+                font-size: 0.85em;
+                border-radius: 10px;
+            }
+            
+            th, td {
+                padding: 10px 8px;
+            }
+            
+            th {
+                font-size: 0.8em;
+            }
+            
+            .credit {
+                margin-top: 30px;
+                padding: 15px;
+                gap: 12px;
+            }
+            
+            .credit p {
+                font-size: 1em;
+            }
+            
+            .linkedin-button {
+                padding: 10px 20px;
+                font-size: 0.9em;
+                border-radius: 20px;
+            }
+            
+            .linkedin-button img {
+                width: 18px;
+                height: 18px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.5em;
+            }
+            
+            .header h2 {
+                font-size: 1.1em;
+            }
+            
+            .container {
+                padding: 15px 10px;
+                border-radius: 10px;
+            }
+            
+            h3 {
+                font-size: 1.2em;
+            }
+            
+            .ct-row .ct-input-wrapper {
+                padding: 6px;
+                gap: 5px;
+            }
+            
+            .ct-row .ct-input-wrapper input {
+                padding: 6px;
+                font-size: 13px;
+                min-width: 50px;
+            }
+            
+            .input-group input[type="number"] {
+                padding: 10px;
+                font-size: 13px;
+            }
+            
+            button {
+                padding: 12px;
+                font-size: 14px;
+            }
+            
+            table {
+                font-size: 0.75em;
+            }
+            
+            th, td {
+                padding: 8px 6px;
+            }
+            
+            .result {
+                padding: 12px;
+                font-size: 0.9em;
+            }
+            
+            .linkedin-button {
+                padding: 8px 16px;
+                font-size: 0.8em;
+            }
+        }
+        
+        @media (max-width: 360px) {
+            .header h1 {
+                font-size: 1.3em;
+            }
+            
+            .header h2 {
+                font-size: 1em;
+            }
+            
+            .container {
+                padding: 12px 8px;
+            }
+            
+            h3 {
+                font-size: 1.1em;
+            }
+            
+            .ct-row .ct-input-wrapper {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+            }
+            
+            .ct-row .ct-input-wrapper input {
+                width: 100%;
+                text-align: center;
+            }
+            
+            .ct-row .ct-input-wrapper span {
+                text-align: center;
+                font-size: 0.7em;
+            }
+            
+            table {
+                font-size: 0.7em;
+            }
+            
+            th, td {
+                padding: 6px 4px;
+            }
+            
+            .result {
+                padding: 10px;
+                font-size: 0.85em;
+            }
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Add staggered animation delays */
+        .ct-row:nth-child(1) { --delay: 0.3s; }
+        .ct-row:nth-child(2) { --delay: 0.4s; }
+        .ct-row:nth-child(3) { --delay: 0.5s; }
+        .ct-row:nth-child(4) { --delay: 0.6s; }
+        .input-group:nth-child(1) { --delay: 0.7s; }
+        .input-group:nth-child(2) { --delay: 0.8s; }
+        .input-group:nth-child(3) { --delay: 0.9s; }
+        .input-group:nth-child(4) { --delay: 1.0s; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <img src="buplogo.png" alt="Bangladesh University of Professionals Logo">
+        <h1>Bangladesh University of Professionals</h1>
+        <h2>CGPA Calculator</h2>
+    </div>
+
+    <div class="container">
+        <div class="info-section">
+            <p><strong>Weightage:</strong> In-course = 60%, Final Exam = 40%.</p>
+            <p><strong>Class Test Conversion:</strong> Sum of 4 CTs (max 40) is converted to 10 marks.</p>
+        </div>
+
+        <h3>Your Grading System</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Class Interval</th>
+                    <th>Letter Grade</th>
+                    <th>Grade Point</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td>80-100</td><td>A+</td><td>4.00</td></tr>
+                <tr><td>75-79</td><td>A</td><td>3.75</td></tr>
+                <tr><td>70-74</td><td>A-</td><td>3.50</td></tr>
+                <tr><td>65-69</td><td>B+</td><td>3.25</td></tr>
+                <tr><td>60-64</td><td>B</td><td>3.00</td></tr>
+                <tr><td>55-59</td><td>B-</td><td>2.75</td></tr>
+                <tr><td>50-54</td><td>C+</td><td>2.50</td></tr>
+                <tr><td>45-49</td><td>C</td><td>2.25</td></tr>
+                <tr><td>40-44</td><td>D</td><td>2.00</td></tr>
+                <tr><td>0-39</td><td>F</td><td>0.00</td></tr>
+            </tbody>
+        </table>
+        
+        <h3>Enter Your In-Course Marks</h3>
+        <p style="text-align: center; color: #7f8c8d; margin-bottom: 25px; font-style: italic;">
+            <em>For Class Tests, enter your score and the total marks for that CT.</em>
+        </p>
+
+        <div class="ct-row">
+            <label for="ct1">Class Test 1 Marks:</label>
+            <div class="ct-input-wrapper">
+                <input type="number" id="ct1" min="0" value="0">
+                <span>out of</span>
+                <input type="number" id="ct1Max" min="1" value="10">
+            </div>
+        </div>
+        <div class="ct-row">
+            <label for="ct2">Class Test 2 Marks:</label>
+            <div class="ct-input-wrapper">
+                <input type="number" id="ct2" min="0" value="0">
+                <span>out of</span>
+                <input type="number" id="ct2Max" min="1" value="10">
+            </div>
+        </div>
+        <div class="ct-row">
+            <label for="ct3">Class Test 3 Marks:</label>
+            <div class="ct-input-wrapper">
+                <input type="number" id="ct3" min="0" value="0">
+                <span>out of</span>
+                <input type="number" id="ct3Max" min="1" value="10">
+            </div>
+        </div>
+        <div class="ct-row">
+            <label for="ct4">Class Test 4 Marks:</label>
+            <div class="ct-input-wrapper">
+                <input type="number" id="ct4" min="0" value="0">
+                <span>out of</span>
+                <input type="number" id="ct4Max" min="1" value="10">
+            </div>
+        </div>
+
+        <div class="input-group">
+            <label for="midTerm">Mid Term Marks (out of 20):</label>
+            <input type="number" id="midTerm" min="0" max="20" value="0">
+        </div>
+        <div class="input-group">
+            <label for="assignments">Assignments/Case Study/In-Class Participation Marks (out of 10):</label>
+            <input type="number" id="assignments" min="0" max="10" value="0">
+        </div>
+        <div class="input-group">
+            <label for="project">Project Paper/Term Paper (Individual) including Presentation Marks (out of 10):</label>
+            <input type="number" id="project" min="0" max="10" value="0">
+        </div>
+        <div class="input-group">
+            <label for="attendance">Attendance Marks (out of 10):</label>
+            <input type="number" id="attendance" min="0" max="10" value="0">
+        </div>
+
+        <h3>Desired Course GPA</h3>
+        <div class="input-group">
+            <label for="desiredGpa">Enter Your Desired GPA for this Course:</label>
+            <input type="number" id="desiredGpa" min="0.00" max="4.00" step="0.01" value="4.00">
+            <span style="color: #7f8c8d; font-size: 0.9em; margin-top: 5px; display: block;">
+                (e.g., 4.00, 3.75, 3.00, etc.)
+            </span>
+        </div>
+
+        <button onclick="calculateRequiredMarks()">Calculate Required Final Exam Marks</button>
+
+        <div id="result" class="result">
+            Enter your marks and desired GPA, then click "Calculate".
+        </div>
+
+        <div class="credit">
+            <p>Created by <strong>Muztaba Rafid Mahi</strong>.</p>
+            <a href="https://www.facebook.com/Muztaba.Rafid.Mahi" target="_blank" class="linkedin-button">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/2023_Facebook_icon.svg/800px-2023_Facebook_icon.svg.png" alt="Facebook">
+                Connect on Facebook
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Define the grading scale
+        const gradingScale = [
+            { gpa: 4.00, minPercent: 80 },
+            { gpa: 3.75, minPercent: 75 },
+            { gpa: 3.50, minPercent: 70 },
+            { gpa: 3.25, minPercent: 65 },
+            { gpa: 3.00, minPercent: 60 },
+            { gpa: 2.75, minPercent: 55 },
+            { gpa: 2.50, minPercent: 50 },
+            { gpa: 2.25, minPercent: 45 },
+            { gpa: 2.00, minPercent: 40 },
+            { gpa: 0.00, minPercent: 0 } // F grade
+        ];
+
+        function getMinPercentageForGPA(gpa) {
+            for (let i = 0; i < gradingScale.length; i++) {
+                if (gpa === gradingScale[i].gpa) {
+                    return gradingScale[i].minPercent;
+                }
+            }
+            return null; // GPA not found in the defined scale
+        }
+
+        function calculateRequiredMarks() {
+            // Add loading animation to button
+            const button = document.querySelector('button');
+            const originalText = button.innerHTML;
+            button.innerHTML = '<div class="loading"></div> Calculating...';
+            button.disabled = true;
+
+            // Simulate calculation delay for smooth animation
+            setTimeout(() => {
+                performCalculation();
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }, 500);
+        }
+
+        function performCalculation() {
+            // Get input values for CTs and their max marks
+            const ct1 = parseFloat(document.getElementById('ct1').value) || 0;
+            const ct1Max = parseFloat(document.getElementById('ct1Max').value) || 10;
+            const ct2 = parseFloat(document.getElementById('ct2').value) || 0;
+            const ct2Max = parseFloat(document.getElementById('ct2Max').value) || 10;
+            const ct3 = parseFloat(document.getElementById('ct3').value) || 0;
+            const ct3Max = parseFloat(document.getElementById('ct3Max').value) || 10;
+            const ct4 = parseFloat(document.getElementById('ct4').value) || 0;
+            const ct4Max = parseFloat(document.getElementById('ct4Max').value) || 10;
+
+            const midTerm = parseFloat(document.getElementById('midTerm').value) || 0;
+            const assignments = parseFloat(document.getElementById('assignments').value) || 0;
+            const project = parseFloat(document.getElementById('project').value) || 0;
+            const attendance = parseFloat(document.getElementById('attendance').value) || 0;
+            const desiredGpa = parseFloat(document.getElementById('desiredGpa').value);
+
+            const resultDiv = document.getElementById('result');
+
+            // Validate CT inputs
+            if (ct1 < 0 || ct1 > ct1Max || ct1Max <= 0 ||
+                ct2 < 0 || ct2 > ct2Max || ct2Max <= 0 ||
+                ct3 < 0 || ct3 > ct3Max || ct3Max <= 0 ||
+                ct4 < 0 || ct4 > ct4Max || ct4Max <= 0 ||
+                midTerm < 0 || midTerm > 20 || assignments < 0 || assignments > 10 ||
+                project < 0 || project > 10 || attendance < 0 || attendance > 10 ||
+                desiredGpa < 0 || desiredGpa > 4.00 || isNaN(desiredGpa)) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = 'Please enter valid marks within the specified ranges for all fields, and valid "out of" values for Class Tests (must be greater than 0).';
+                return;
+            }
+
+            // Get the minimum percentage required for the desired GPA
+            const targetMinPercentage = getMinPercentageForGPA(desiredGpa);
+
+            if (targetMinPercentage === null) {
+                resultDiv.className = 'result error';
+                resultDiv.innerHTML = `Error: Desired GPA ${desiredGpa.toFixed(2)} does not exactly match any defined grade point. Please choose from: 4.00, 3.75, 3.50, 3.25, 3.00, 2.75, 2.50, 2.25, 2.00, 0.00.`;
+                return;
+            }
+
+            // Calculate each CT's contribution to the total 10 marks for CTs
+            const ctContribution1 = (ct1 / ct1Max) * 2.5;
+            const ctContribution2 = (ct2 / ct2Max) * 2.5;
+            const ctContribution3 = (ct3 / ct3Max) * 2.5;
+            const ctContribution4 = (ct4 / ct4Max) * 2.5;
+
+            const convertedCTMarks = ctContribution1 + ctContribution2 + ctContribution3 + ctContribution4;
+
+            // Calculate total in-course marks out of 60
+            const inCourse60Percent = convertedCTMarks + midTerm + assignments + project + attendance;
+
+            // Determine target total marks (out of 100) based on desired GPA percentage
+            const targetTotalMarks = targetMinPercentage;
+
+            // Calculate marks needed from the final exam
+            const requiredFinalExamScoreWeighted = targetTotalMarks - inCourse60Percent;
+            let requiredFinalExamMark = requiredFinalExamScoreWeighted / 0.40;
+
+            resultDiv.className = 'result';
+
+            if (requiredFinalExamMark > 100) {
+                resultDiv.innerHTML = `To achieve a GPA of <strong>${desiredGpa.toFixed(2)}</strong> (requiring ${targetMinPercentage}% total), you would need to score <strong>${requiredFinalExamMark.toFixed(2)}</strong> out of 100 in the Final Exam.<br><br>⚠️ It appears challenging or impossible to reach this GPA with your current in-course marks, as the required final exam score exceeds 100%. Consider aiming for a slightly lower GPA or improving future in-course components if possible.`;
+                resultDiv.className = 'result error';
+            } else if (requiredFinalExamMark < 0) {
+                resultDiv.innerHTML = `🎉 Congratulations! You have already secured more than enough marks to achieve a GPA of <strong>${desiredGpa.toFixed(2)}</strong>.<br>You would only need <strong>0</strong> marks in the Final Exam. Your current in-course score is ${inCourse60Percent.toFixed(2)} / 60.`;
+            } else {
+                resultDiv.innerHTML = `📊 To achieve a GPA of <strong>${desiredGpa.toFixed(2)}</strong> (requiring ${targetMinPercentage}% total), you need to score <strong>${requiredFinalExamMark.toFixed(2)}</strong> out of 100 in the Final Exam.<br><br>💪 Your current in-course score: ${inCourse60Percent.toFixed(2)} / 60`;
+            }
+        }
+
+        // Add smooth scrolling to result
+        function scrollToResult() {
+            document.getElementById('result').scrollIntoView({
+                behavior: 'smooth',
+                block: 'center'
+            });
+        }
+    </script>
+</body>
+</html>
