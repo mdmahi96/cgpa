@@ -6,425 +6,1246 @@
 <title>BUP CGPA Calculator</title>
 <link rel="icon" type="image/x-icon" href="buplogo.png">
 <style>
+  /* ── Design tokens ── */
   :root{
-    --bg:#f3f4f8;
+    --bg:#f0f2f8;
     --surface:#ffffff;
-    --primary:#5b56e0;
-    --primary-dark:#4541b8;
-    --primary-tint:#eceeff;
-    --text:#1f2230;
+    --primary:#4f46e5;
+    --primary-dark:#3730a3;
+    --primary-light:#6366f1;
+    --primary-tint:#eef2ff;
+    --primary-tint2:#e0e7ff;
+    --text:#111827;
+    --text2:#374151;
     --muted:#6b7280;
-    --border:#e3e4ec;
-    --success:#1f8a4c;
-    --success-bg:#eaf8ef;
-    --error:#d23c3c;
-    --error-bg:#fdecec;
-    --radius:14px;
+    --border:#e5e7eb;
+    --border2:#d1d5db;
+    --success:#059669;
+    --success-bg:#ecfdf5;
+    --success-border:#a7f3d0;
+    --warn:#d97706;
+    --warn-bg:#fffbeb;
+    --error:#dc2626;
+    --error-bg:#fef2f2;
+    --error-border:#fecaca;
+    --radius:16px;
+    --radius-sm:10px;
+    --shadow:0 1px 3px rgba(0,0,0,.08),0 1px 2px rgba(0,0,0,.04);
+    --shadow-md:0 4px 16px rgba(0,0,0,.10),0 2px 6px rgba(0,0,0,.06);
+    --transition:160ms cubic-bezier(.4,0,.2,1);
   }
 
   *{ margin:0; padding:0; box-sizing:border-box; }
+  [hidden]{ display:none !important; }
 
   body{
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
     background:var(--bg);
     color:var(--text);
-    line-height:1.5;
-    padding:16px;
+    line-height:1.6;
+    min-height:100vh;
   }
 
-  .page{ max-width:720px; margin:0 auto; }
+  /* ── Page shell ── */
+  .shell{ max-width:760px; margin:0 auto; padding:16px 14px 40px; }
 
-  .top{ text-align:center; margin-bottom:18px; }
-  .top h1{ font-size:clamp(1.3rem,4.5vw,1.8rem); color:var(--primary-dark); }
-  .top .subtitle{ color:var(--muted); margin-top:6px; font-size:.92rem; }
+  /* ── Hero header ── */
+  .hero{
+    background:linear-gradient(135deg,var(--primary) 0%,var(--primary-dark) 100%);
+    border-radius:var(--radius);
+    padding:28px 24px 24px;
+    text-align:center;
+    color:#fff;
+    margin-bottom:20px;
+    position:relative;
+    overflow:hidden;
+  }
+  .hero::before{
+    content:'';
+    position:absolute;
+    inset:0;
+    background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  }
+  .hero-logo{
+    width:64px; height:64px; border-radius:50%;
+    object-fit:cover;
+    border:3px solid rgba(255,255,255,.3);
+    margin-bottom:12px;
+    position:relative;
+  }
+  .hero h1{
+    font-size:clamp(1.35rem,5vw,1.9rem);
+    font-weight:800;
+    letter-spacing:-.01em;
+    position:relative;
+  }
+  .hero .tagline{
+    font-size:.9rem;
+    opacity:.85;
+    margin-top:4px;
+    position:relative;
+  }
+  .hero-pills{
+    display:flex; justify-content:center; flex-wrap:wrap; gap:8px;
+    margin-top:14px; position:relative;
+  }
+  .hero-pill{
+    background:rgba(255,255,255,.18);
+    border:1px solid rgba(255,255,255,.25);
+    border-radius:999px;
+    padding:3px 11px;
+    font-size:.75rem;
+    font-weight:600;
+    letter-spacing:.3px;
+  }
 
-  .main-card{
+  /* ── Card ── */
+  .card{
     background:var(--surface);
     border-radius:var(--radius);
-    padding:18px;
-    box-shadow:0 1px 4px rgba(20,20,40,.08);
-    border-top:4px solid var(--primary);
+    box-shadow:var(--shadow);
+    padding:20px;
+    margin-bottom:16px;
   }
+  .card-title{
+    font-size:.7rem;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.6px;
+    color:var(--muted);
+    margin-bottom:12px;
+    display:flex;
+    align-items:center;
+    gap:7px;
+  }
+  .card-title svg{ width:14px; height:14px; flex-shrink:0; }
 
-  .info-line{
-    background:var(--primary-tint);
-    color:var(--primary-dark);
-    border-radius:10px;
-    padding:10px 14px;
+  /* ── Mode tabs ── */
+  .mode-tabs{
+    display:flex;
+    background:var(--bg);
+    border-radius:999px;
+    padding:3px;
+    gap:3px;
+    margin-bottom:16px;
+  }
+  .mode-tabs input{ position:absolute; opacity:0; pointer-events:none; }
+  .mode-tabs label{
+    flex:1;
+    text-align:center;
+    padding:9px 8px;
+    border-radius:999px;
+    font-size:.8rem;
+    font-weight:600;
+    color:var(--muted);
+    cursor:pointer;
+    transition:background var(--transition), color var(--transition);
+    white-space:nowrap;
+  }
+  .mode-tabs input:checked + label{
+    background:var(--surface);
+    color:var(--primary);
+    box-shadow:0 1px 4px rgba(79,70,229,.2);
+  }
+  .mode-tabs label:hover{ color:var(--primary); }
+  .mode-tabs input:focus-visible + label{ outline:2px solid var(--primary); outline-offset:2px; }
+
+  .mode-desc{
     font-size:.82rem;
-    margin-bottom:18px;
+    color:var(--muted);
+    background:var(--primary-tint);
+    border-radius:var(--radius-sm);
+    padding:9px 13px;
+    margin-bottom:16px;
+    display:flex;
+    align-items:flex-start;
+    gap:7px;
   }
+  .mode-desc svg{ width:14px; height:14px; flex-shrink:0; margin-top:2px; color:var(--primary); }
 
-  /* Mode switch */
-  .mode-switch{ display:flex; background:var(--bg); border-radius:999px; padding:4px; margin-bottom:8px; flex-wrap:wrap; gap:4px; }
-  .mode-switch input{ position:absolute; opacity:0; pointer-events:none; }
-  .mode-switch label{
-    flex:1 1 auto; min-width:30%; text-align:center; padding:10px 6px; border-radius:999px;
-    font-weight:600; font-size:.78rem; color:var(--muted); cursor:pointer;
+  /* ── Semester picker ── */
+  .semester-wrap{ margin-bottom:16px; }
+  .sem-label{
+    display:block; font-size:.82rem; font-weight:600; color:var(--text2); margin-bottom:6px;
   }
-  .mode-switch input:checked + label{
-    background:var(--primary); color:#fff; box-shadow:0 2px 6px rgba(91,86,224,.35);
-  }
-  .mode-switch input:focus-visible + label{ outline:2px solid var(--primary-dark); outline-offset:2px; }
-
-  .mode-hint{ font-size:.78rem; color:var(--muted); text-align:center; margin-bottom:18px; }
-
-  /* Generic field styling */
-  .field{ display:block; margin-bottom:12px; }
-  .field > label{ display:block; font-size:.82rem; font-weight:600; color:var(--muted); margin-bottom:6px; }
-
-  select, input[type="number"], input[type="text"]{
+  .sem-label span{ color:var(--muted); font-weight:400; font-size:.75rem; }
+  select{
     width:100%;
-    padding:11px 12px;
-    border:1.5px solid var(--border);
-    border-radius:10px;
-    font-size:1rem;
+    padding:11px 14px;
+    border:1.5px solid var(--border2);
+    border-radius:var(--radius-sm);
+    font-size:.95rem;
     background:#fff;
     color:var(--text);
     font-family:inherit;
+    cursor:pointer;
+    appearance:none;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;
+    background-position:right 12px center;
+    background-size:18px;
+    padding-right:40px;
+    transition:border-color var(--transition), box-shadow var(--transition);
   }
-  select:focus, input:focus{
-    outline:none; border-color:var(--primary);
-    box-shadow:0 0 0 3px rgba(91,86,224,.15);
-  }
-  select:disabled{ background:#f3f4f8; color:var(--muted); }
+  select:focus{ outline:none; border-color:var(--primary); box-shadow:0 0 0 3px rgba(79,70,229,.12); }
 
-  input[type="number"]::-webkit-inner-spin-button,
-  input[type="number"]::-webkit-outer-spin-button{ -webkit-appearance:none; margin:0; }
-  input[type="number"]{ -moz-appearance:textfield; }
-
-  .info-note.semester-note{
-    background:var(--primary-tint); color:var(--primary-dark); border-radius:10px;
-    padding:10px 14px; margin:10px 0 0; font-size:.8rem;
-  }
-  .course-card.single-mode .remove-btn{ display:none; }
-
-  .btn{
-    display:flex; align-items:center; justify-content:center; gap:6px;
-    width:100%; padding:12px 18px; border:none; border-radius:10px;
-    font-size:.95rem; font-weight:600; cursor:pointer; font-family:inherit;
-  }
-  .btn-outline{ background:#fff; border:1.5px solid var(--primary); color:var(--primary); }
-  .btn-outline:hover{ background:var(--primary-tint); }
-  .btn-primary{ background:var(--primary); color:#fff; box-shadow:0 4px 14px rgba(91,86,224,.3); }
-  .btn-primary:hover{ background:var(--primary-dark); }
-  .btn-secondary{ background:#fff; border:1.5px solid var(--border); color:var(--text); }
-  .btn-secondary:hover{ background:#f7f7fb; }
-  .btn:focus-visible{ outline:2px solid var(--primary-dark); outline-offset:2px; }
-
-  /* Courses list */
-  .courses{ display:flex; flex-direction:column; gap:14px; margin-bottom:18px; }
+  /* ── Empty state ── */
   .empty-hint{
-    text-align:center; color:var(--muted); font-size:.88rem; padding:18px;
-    border:1.5px dashed var(--border); border-radius:12px;
+    text-align:center; color:var(--muted); font-size:.88rem;
+    padding:28px 20px;
+    border:1.5px dashed var(--border2);
+    border-radius:var(--radius-sm);
+    display:flex; flex-direction:column; align-items:center; gap:8px;
   }
+  .empty-hint svg{ width:36px; height:36px; opacity:.35; }
 
-  .course-card{ border:1.5px solid var(--border); border-radius:12px; padding:16px; background:#fafaff; }
-  .course-card-head{ display:flex; justify-content:space-between; align-items:flex-start; gap:8px; margin-bottom:14px; }
-  .course-name-wrap{ flex:1; min-width:0; }
-  .course-code{ display:block; font-size:.72rem; color:var(--primary); font-weight:700; letter-spacing:.4px; text-transform:uppercase; margin-bottom:4px; }
-  input.course-name{
-    font-size:1rem; font-weight:700; padding:8px 10px; border:1.5px solid transparent;
-    border-radius:8px; background:transparent; width:100%;
+  /* ── Course card ── */
+  .courses{ display:flex; flex-direction:column; gap:16px; margin-bottom:16px; }
+  .course-card{
+    border:1.5px solid var(--border);
+    border-radius:var(--radius-sm);
+    overflow:hidden;
+    background:var(--surface);
+    transition:box-shadow var(--transition);
   }
-  input.course-name:hover{ border-color:var(--border); background:#fff; }
-  input.course-name:focus{ border-color:var(--primary); background:#fff; box-shadow:0 0 0 3px rgba(91,86,224,.15); }
+  .course-card:focus-within{ box-shadow:var(--shadow-md); }
+
+  .course-card-head{
+    display:flex; align-items:center; gap:10px;
+    padding:12px 14px;
+    background:var(--primary-tint);
+    border-bottom:1.5px solid var(--primary-tint2);
+  }
+  .course-icon{
+    width:34px; height:34px; border-radius:8px;
+    background:var(--primary); display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+  }
+  .course-icon svg{ width:17px; height:17px; color:#fff; }
+  .course-name-wrap{ flex:1; min-width:0; }
+  .course-code-badge{
+    display:inline-block;
+    font-size:.68rem; font-weight:700; letter-spacing:.5px; text-transform:uppercase;
+    color:var(--primary); background:white; border-radius:4px;
+    padding:1px 6px; margin-bottom:3px;
+    border:1px solid var(--primary-tint2);
+  }
+  input.course-name{
+    font-size:.97rem; font-weight:700;
+    padding:4px 8px;
+    border:1.5px solid transparent;
+    border-radius:7px;
+    background:transparent;
+    width:100%;
+    color:var(--text);
+    font-family:inherit;
+    transition:border-color var(--transition), background var(--transition);
+  }
+  input.course-name:hover{ border-color:var(--primary-tint2); background:#fff; }
+  input.course-name:focus{ border-color:var(--primary); background:#fff; outline:none; box-shadow:0 0 0 3px rgba(79,70,229,.1); }
   .remove-btn{
-    background:none; border:none; font-size:1.4rem; line-height:1; color:var(--muted);
-    cursor:pointer; padding:2px 8px; border-radius:6px; flex-shrink:0;
+    background:none; border:none; width:30px; height:30px; border-radius:7px;
+    display:flex; align-items:center; justify-content:center;
+    color:var(--muted); cursor:pointer; flex-shrink:0;
+    transition:background var(--transition), color var(--transition);
   }
   .remove-btn:hover{ background:var(--error-bg); color:var(--error); }
-  .remove-btn:focus-visible{ outline:2px solid var(--error); outline-offset:2px; }
+  .remove-btn svg{ width:16px; height:16px; }
 
-  .ct-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-bottom:14px; }
-  .ct-field-label{ display:block; font-size:.76rem; font-weight:600; color:var(--muted); margin-bottom:4px; }
+  /* ── Inside the card body ── */
+  .course-card-body{ padding:14px; display:flex; flex-direction:column; gap:14px; }
+
+  /* section header inside card */
+  .section-hdr{
+    display:flex; align-items:center; gap:7px;
+    font-size:.72rem; font-weight:700; text-transform:uppercase;
+    letter-spacing:.5px; color:var(--primary);
+    padding-bottom:6px;
+    border-bottom:1px solid var(--primary-tint2);
+  }
+  .section-hdr .badge-pill{
+    background:var(--primary-tint2);
+    color:var(--primary-dark);
+    border-radius:999px;
+    padding:1px 8px;
+    font-size:.68rem;
+  }
+  .ct-legend{
+    margin-left:auto; font-size:.66rem; font-weight:700; text-transform:none; letter-spacing:0;
+    display:flex; gap:8px; align-items:center; color:var(--muted);
+  }
+  .dot-score{ color:#2563eb; font-size:.8rem; }
+  .dot-max{ color:#94a3b8; font-size:.8rem; }
+
+  /* ── CT grid & Color Coding ── */
+  .ct-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+  .ct-col{
+    background:#f8faff;
+    border:1.5px solid #dbeafe;
+    border-radius:10px;
+    padding:8px;
+    transition:border-color var(--transition), box-shadow var(--transition);
+  }
+  .ct-col:focus-within{
+    border-color:#3b82f6;
+    box-shadow:0 0 0 3px rgba(59,130,246,.15);
+  }
+  .ct-field-label{
+    display:flex; justify-content:space-between; align-items:center;
+    font-size:.74rem; font-weight:700; color:#1e40af; margin-bottom:6px;
+  }
+  .ct-label-tags{
+    display:flex; align-items:center; gap:2px; font-size:.62rem; font-weight:700;
+  }
+  .tag-score{
+    background:#dbeafe; color:#1e40af; padding:1px 5px; border-radius:4px;
+    border:1px solid #bfdbfe;
+  }
+  .tag-sep{ color:#94a3b8; font-size:.65rem; padding:0 1px; }
+  .tag-max{
+    background:#f1f5f9; color:#475569; padding:1px 5px; border-radius:4px;
+    border:1px solid #e2e8f0;
+  }
+
   .ct-pair{
-    display:flex; align-items:center; gap:6px; background:#fff;
-    border:1.5px solid var(--border); border-radius:8px; padding:2px 8px;
+    display:flex; align-items:center; gap:4px;
   }
-  .ct-pair input{ border:none; width:100%; padding:8px 2px; text-align:center; font-size:.95rem; background:transparent; }
-  .ct-pair input:focus{ outline:none; box-shadow:none; }
-  .ct-pair span{ color:var(--muted); font-size:.85rem; }
-
-  .fields-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin-bottom:14px; }
-  .field-box{ display:block; }
-  .field-box span{ display:block; font-size:.76rem; font-weight:600; color:var(--muted); margin-bottom:4px; }
-  .field-box small{ font-weight:400; color:var(--muted); }
-
-  .direct-grid{ display:grid; grid-template-columns:1fr; gap:10px; margin-bottom:14px; }
-  @media (min-width:600px){ .direct-grid{ grid-template-columns:1fr 1fr; } }
-
-  /* Actions */
-  .actions{ display:flex; flex-direction:column; gap:10px; margin-bottom:18px; }
-
-  /* Results */
-  .results{ display:flex; flex-direction:column; gap:10px; margin-bottom:18px; }
-  .results-summary{ font-size:.86rem; color:var(--muted); }
-  .result-row{ border-radius:12px; padding:14px 16px; border:1.5px solid var(--border); background:#fafaff; }
-  .result-row.status-achieved{ border-color:var(--success); background:var(--success-bg); }
-  .result-row.status-impossible{ border-color:var(--error); background:var(--error-bg); }
-  .result-row-head{ display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:6px; }
-  .result-row-head strong{ font-size:.94rem; }
-  .badge{ font-size:.7rem; background:var(--primary-tint); color:var(--primary-dark); padding:3px 10px; border-radius:999px; font-weight:700; white-space:nowrap; }
-  .result-row.status-achieved .badge{ background:#d3f3e0; color:var(--success); }
-  .result-row.status-impossible .badge{ background:#fbdada; color:var(--error); }
-  .result-row-body{ font-size:.88rem; }
-
-  .error-box{ border:1.5px solid var(--error); background:var(--error-bg); color:var(--error); padding:12px 16px; border-radius:12px; font-size:.88rem; }
-
-  /* Grading details */
-  .grading-details{ border-top:1px solid var(--border); padding-top:14px; }
-  .grading-details summary{ cursor:pointer; font-weight:600; font-size:.88rem; color:var(--primary-dark); }
-  .info-note{ margin:12px 0; font-size:.84rem; color:var(--muted); }
-  .info-note p{ margin-bottom:4px; }
-  .grading-table{ width:100%; border-collapse:collapse; margin-top:10px; font-size:.84rem; }
-  .grading-table th, .grading-table td{ padding:8px; text-align:center; border-bottom:1px solid var(--border); }
-  .grading-table th{ background:var(--bg); color:var(--muted); font-weight:700; text-transform:uppercase; font-size:.7rem; letter-spacing:.4px; }
-
-  footer.credit{ text-align:center; margin-top:24px; display:flex; flex-direction:column; align-items:center; gap:10px; }
-  footer.credit p{ color:var(--muted); font-size:.84rem; }
-  .social-button{
-    display:inline-flex; align-items:center; gap:8px; background:var(--primary); color:#fff;
-    padding:10px 18px; border-radius:999px; text-decoration:none; font-size:.84rem; font-weight:600;
+  /* Score Input: Vibrant Blue/Indigo */
+  input[type="number"].ct-score-input{
+    flex:1; min-width:0;
+    padding:8px 4px;
+    border:1.5px solid #93c5fd;
+    border-radius:7px;
+    background:#eff6ff;
+    color:#1e3a8a;
+    font-weight:700;
+    font-size:.95rem;
+    text-align:center;
+    transition:all var(--transition);
   }
-  .social-button:hover{ background:var(--primary-dark); }
-
-  /* Download popup */
-  .download-popup{
-    position:fixed; inset:0; background:rgba(20,20,40,.45);
-    display:flex; align-items:center; justify-content:center; padding:16px;
-    opacity:0; visibility:hidden; z-index:1000;
-  }
-  .download-popup.active{ opacity:1; visibility:visible; }
-  .download-content{ background:#fff; border-radius:14px; padding:24px; max-width:340px; text-align:center; }
-  .download-content h3{ margin-bottom:10px; }
-  .download-content p{ color:var(--muted); font-size:.88rem; margin-bottom:16px; }
-  .download-buttons{ display:flex; gap:10px; }
-  .download-buttons button{ flex:1; padding:10px; border:none; border-radius:8px; font-weight:600; cursor:pointer; font-family:inherit; }
-  .download-buttons .confirm{ background:var(--primary); color:#fff; }
-  .download-buttons .cancel{ background:var(--bg); color:var(--text); }
-
-  @media (prefers-reduced-motion: reduce){
-    *{ transition:none !important; animation:none !important; }
+  input[type="number"].ct-score-input:focus{
+    background:#ffffff;
+    border-color:#2563eb;
+    box-shadow:0 0 0 2px rgba(37,99,235,.25);
+    outline:none;
   }
 
-  /* Desktop / wider screens */
-  @media (min-width:600px){
-    body{ padding:32px 16px; }
-    .main-card{ padding:32px; }
-    .top h1{ font-size:2rem; }
-    .ct-grid{ grid-template-columns:repeat(4,1fr); }
-    .fields-grid{ grid-template-columns:repeat(4,1fr); }
-    .actions{ flex-direction:row; }
-    .actions .btn{ width:auto; flex:1; }
-    .mode-switch{ max-width:520px; margin:0 auto 8px; }
-    .mode-hint{ max-width:520px; margin:0 auto 18px; }
+  .ct-sep{
+    color:#94a3b8; font-size:.9rem; font-weight:700; user-select:none;
   }
 
-  /* Grade range table inside results */
-  .grade-range-wrap{ margin-top:12px; }
-  .grade-range-wrap .grange-title{
+  /* Full Mark / Max Input: Neutral Slate */
+  input[type="number"].ct-max-input{
+    flex:1; min-width:0;
+    padding:8px 4px;
+    border:1.5px solid #cbd5e1;
+    border-radius:7px;
+    background:#f8fafc;
+    color:#475569;
+    font-weight:600;
+    font-size:.88rem;
+    text-align:center;
+    transition:all var(--transition);
+  }
+  input[type="number"].ct-max-input:focus{
+    background:#ffffff;
+    border-color:#64748b;
+    box-shadow:0 0 0 2px rgba(100,116,139,.25);
+    outline:none;
+  }
+
+  /* ── Other marks grid & Color Coding ── */
+  .marks-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .mark-field{
+    display:block;
+    border-radius:10px;
+    padding:9px 11px;
+    border:1.5px solid var(--border);
+    transition:border-color var(--transition), box-shadow var(--transition);
+  }
+  .mark-field:focus-within{
+    box-shadow:var(--shadow-md);
+  }
+  .mark-label{
+    display:flex; justify-content:space-between; align-items:center;
+    font-size:.74rem; font-weight:700; margin-bottom:6px;
+  }
+  .mark-label .out-of{
+    font-size:.67rem; font-weight:700;
+    padding:2px 7px; border-radius:999px;
+  }
+
+  /* Mid-term: Warm Amber / Orange */
+  .mark-field-midterm{
+    background:#fffaf0;
+    border-color:#fed7aa;
+  }
+  .mark-field-midterm:focus-within{ border-color:#f97316; }
+  .mark-field-midterm .mark-label span:first-child{ color:#9a3412; }
+  .out-of-midterm{ background:#ffedd5; color:#c2410c; border:1px solid #fdba74; }
+  input[type="number"].input-midterm{
+    background:#fffbeb;
+    border-color:#fcd34d;
+    color:#78350f;
+    font-weight:700;
+  }
+  input[type="number"].input-midterm:focus{
+    background:#ffffff;
+    border-color:#d97706;
+    box-shadow:0 0 0 3px rgba(217,119,6,.2);
+  }
+
+  /* Assignments: Fresh Emerald Green */
+  .mark-field-assignments{
+    background:#f6fef9;
+    border-color:#a7f3d0;
+  }
+  .mark-field-assignments:focus-within{ border-color:#10b981; }
+  .mark-field-assignments .mark-label span:first-child{ color:#065f46; }
+  .out-of-assignments{ background:#d1fae5; color:#047857; border:1px solid #6ee7b7; }
+  input[type="number"].input-assignments{
+    background:#ecfdf5;
+    border-color:#6ee7b7;
+    color:#064e3b;
+    font-weight:700;
+  }
+  input[type="number"].input-assignments:focus{
+    background:#ffffff;
+    border-color:#059669;
+    box-shadow:0 0 0 3px rgba(5,150,105,.2);
+  }
+
+  /* Attendance: Sky Blue */
+  .mark-field-attendance{
+    background:#f0f9ff;
+    border-color:#bae6fd;
+  }
+  .mark-field-attendance:focus-within{ border-color:#0ea5e9; }
+  .mark-field-attendance .mark-label span:first-child{ color:#075985; }
+  .out-of-attendance{ background:#e0f2fe; color:#0369a1; border:1px solid #7dd3fc; }
+  input[type="number"].input-attendance{
+    background:#f0f9ff;
+    border-color:#7dd3fc;
+    color:#0c4a6e;
+    font-weight:700;
+  }
+  input[type="number"].input-attendance:focus{
+    background:#ffffff;
+    border-color:#0284c7;
+    box-shadow:0 0 0 3px rgba(2,132,199,.2);
+  }
+
+  /* Direct entry mark field: Violet / Purple */
+  .mark-field-direct{
+    background:#faf5ff;
+    border-color:#ddd6fe;
+  }
+  .mark-field-direct:focus-within{ border-color:#8b5cf6; }
+  .mark-field-direct .mark-label span:first-child{ color:#5b21b6; }
+  .out-of-direct{ background:#ede9fe; color:#6d28d9; border:1px solid #c4b5fd; }
+  input[type="number"].input-direct{
+    background:#f5f3ff;
+    border-color:#c4b5fd;
+    color:#4c1d95;
+    font-weight:700;
+  }
+  input[type="number"].input-direct:focus{
+    background:#ffffff;
+    border-color:#7c3aed;
+    box-shadow:0 0 0 3px rgba(124,58,237,.2);
+  }
+  input[type="number"]{
+    width:100%;
+    padding:10px 12px;
+    border:1.5px solid var(--border2);
+    border-radius:8px;
+    font-size:.95rem;
+    background:#fff;
+    color:var(--text);
+    font-family:inherit;
+    transition:border-color var(--transition), box-shadow var(--transition);
+  }
+  input[type="number"]:focus{
+    outline:none; border-color:var(--primary);
+    box-shadow:0 0 0 3px rgba(79,70,229,.1);
+  }
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button{ -webkit-appearance:none; margin:0; }
+  input[type="number"]{ -moz-appearance:textfield; appearance:textfield; }
+
+  /* ── Live in-course bar ── */
+  .live-bar-wrap{
+    background:var(--bg);
+    border:1.5px solid var(--border);
+    border-radius:8px;
+    padding:10px 12px;
+  }
+  .live-bar-top{
+    display:flex; justify-content:space-between; align-items:center;
+    margin-bottom:7px;
+  }
+  .live-bar-label{ font-size:.75rem; font-weight:600; color:var(--text2); }
+  .live-bar-score{ font-size:.88rem; font-weight:700; color:var(--primary); }
+  .live-bar-track{
+    height:8px; border-radius:999px;
+    background:var(--border2);
+    overflow:hidden;
+  }
+  .live-bar-fill{
+    height:100%; border-radius:999px;
+    background:linear-gradient(90deg, var(--primary-light), var(--primary));
+    transition:width .3s ease, background .3s;
+    min-width:0; max-width:100%;
+  }
+  .live-bar-fill.good{ background:linear-gradient(90deg,#34d399,var(--success)); }
+  .live-bar-fill.warn{ background:linear-gradient(90deg,#fbbf24,var(--warn)); }
+  .live-bar-fill.full{ background:linear-gradient(90deg,#34d399,#059669); }
+
+  /* ── Target GPA select ── */
+  .gpa-row{
+    display:flex; align-items:center; gap:10px;
+    padding:10px 12px;
+    background:var(--primary-tint);
+    border-radius:8px;
+    border:1.5px solid var(--primary-tint2);
+  }
+  .gpa-row svg{ width:18px; height:18px; color:var(--primary); flex-shrink:0; }
+  .gpa-row label{ font-size:.8rem; font-weight:700; color:var(--primary-dark); white-space:nowrap; }
+  .gpa-row select{
+    flex:1; padding:7px 36px 7px 10px;
+    border-color:var(--primary-tint2);
+    font-size:.88rem; font-weight:600; color:var(--primary-dark);
+    background-color:white;
+    border-radius:7px;
+  }
+
+  /* ── Direct mode ── */
+  .direct-grid{ display:grid; grid-template-columns:1fr; gap:12px; }
+  @media(min-width:520px){ .direct-grid{ grid-template-columns:1fr 1fr; } }
+
+  /* ── Buttons ── */
+  .actions{
+    display:flex; gap:10px; margin-bottom:16px;
+    flex-direction:column;
+  }
+  @media(min-width:480px){ .actions{ flex-direction:row; } }
+  .btn{
+    display:flex; align-items:center; justify-content:center; gap:8px;
+    padding:13px 20px; border:none; border-radius:var(--radius-sm);
+    font-size:.93rem; font-weight:700; cursor:pointer; font-family:inherit;
+    transition:background var(--transition), transform var(--transition), box-shadow var(--transition);
+    flex:1;
+  }
+  .btn svg{ width:18px; height:18px; flex-shrink:0; }
+  .btn:active{ transform:scale(.97); }
+  .btn-primary{
+    background:var(--primary); color:#fff;
+    box-shadow:0 4px 14px rgba(79,70,229,.35);
+  }
+  .btn-primary:hover{ background:var(--primary-dark); }
+  .btn-secondary{
+    background:#fff; border:1.5px solid var(--border2); color:var(--text2);
+  }
+  .btn-secondary:hover{ background:var(--bg); }
+  .btn:focus-visible{ outline:2px solid var(--primary); outline-offset:3px; }
+
+  /* ── Results ── */
+  .results-section{ display:flex; flex-direction:column; gap:12px; margin-bottom:16px; }
+  .results-summary-bar{
+    background:var(--primary-tint);
+    border-radius:var(--radius-sm);
+    padding:10px 14px;
+    display:flex; align-items:center; gap:8px;
+    font-size:.84rem; font-weight:600; color:var(--primary-dark);
+  }
+  .results-summary-bar svg{ width:16px; height:16px; }
+
+  .result-card{
+    border-radius:var(--radius-sm);
+    overflow:hidden;
+    border:1.5px solid var(--border);
+  }
+  .result-card.status-achieved{ border-color:var(--success-border); }
+  .result-card.status-impossible{ border-color:var(--error-border); }
+
+  .result-card-head{
+    display:flex; justify-content:space-between; align-items:flex-start;
+    gap:10px; padding:12px 14px;
+    background:var(--bg);
+    border-bottom:1.5px solid var(--border);
+  }
+  .result-card.status-achieved .result-card-head{ background:var(--success-bg); border-color:var(--success-border); }
+  .result-card.status-impossible .result-card-head{ background:var(--error-bg); border-color:var(--error-border); }
+  .result-card-head-left{ display:flex; flex-direction:column; gap:2px; }
+  .result-course-name{ font-size:.97rem; font-weight:700; color:var(--text); }
+  .result-code{ font-size:.7rem; color:var(--muted); }
+  .result-badge{
+    font-size:.72rem; font-weight:700;
+    padding:3px 10px; border-radius:999px;
+    background:var(--primary-tint2); color:var(--primary-dark);
+    white-space:nowrap; flex-shrink:0;
+  }
+  .result-card.status-achieved .result-badge{ background:#d1fae5; color:var(--success); }
+  .result-card.status-impossible .result-badge{ background:#fee2e2; color:var(--error); }
+
+  .result-card-body{ padding:12px 14px; background:#fff; }
+
+  /* Big score display */
+  .result-big{
+    display:flex; align-items:center; gap:14px; margin-bottom:12px;
+    flex-wrap:wrap;
+  }
+  .result-score-box{
+    text-align:center;
+    background:var(--primary-tint);
+    border-radius:10px;
+    padding:10px 18px;
+    min-width:90px;
+  }
+  .result-card.status-achieved .result-score-box{ background:var(--success-bg); }
+  .result-card.status-impossible .result-score-box{ background:var(--error-bg); }
+  .result-score-num{
+    font-size:1.6rem; font-weight:800; color:var(--primary);
+    line-height:1;
+  }
+  .result-card.status-achieved .result-score-num{ color:var(--success); }
+  .result-card.status-impossible .result-score-num{ color:var(--error); }
+  .result-score-label{ font-size:.7rem; color:var(--muted); margin-top:3px; }
+  .result-msg{ font-size:.87rem; color:var(--text2); line-height:1.55; flex:1; }
+  .result-msg .chip{
+    display:inline-block;
+    background:var(--primary-tint2); color:var(--primary-dark);
+    border-radius:5px; padding:1px 6px; font-size:.8rem; font-weight:700;
+  }
+  .result-card.status-achieved .result-msg .chip{ background:#d1fae5; color:var(--success); }
+  .result-card.status-impossible .result-msg .chip{ background:#fee2e2; color:var(--error); }
+
+  /* grade range table */
+  .grade-range-wrap{ margin-top:0; }
+  .grade-range-toggle{
+    display:flex; align-items:center; justify-content:space-between;
     font-size:.78rem; font-weight:700; color:var(--muted);
-    text-transform:uppercase; letter-spacing:.4px; margin-bottom:6px;
+    text-transform:uppercase; letter-spacing:.5px;
+    cursor:pointer; user-select:none;
+    padding:7px 0;
+    border-top:1px solid var(--border);
   }
+  .grade-range-toggle svg{
+    width:14px; height:14px;
+    transition:transform var(--transition);
+  }
+  .grade-range-wrap.open .grade-range-toggle svg{ transform:rotate(180deg); }
+  .grade-range-table-wrap{
+    display:none; margin-top:8px;
+  }
+  .grade-range-wrap.open .grade-range-table-wrap{ display:block; }
+
   table.grade-range-table{
     width:100%; border-collapse:separate; border-spacing:0;
-    font-size:.82rem; background:#fff; border:1px solid var(--border);
-    border-radius:10px; overflow:hidden;
+    font-size:.82rem; border:1px solid var(--border);
+    border-radius:var(--radius-sm); overflow:hidden;
   }
   table.grade-range-table th, table.grade-range-table td{
     padding:7px 8px; text-align:center; border-bottom:1px solid var(--border);
   }
   table.grade-range-table th{
     background:var(--bg); color:var(--muted); font-weight:700;
-    font-size:.7rem; text-transform:uppercase; letter-spacing:.4px;
+    font-size:.68rem; text-transform:uppercase; letter-spacing:.4px;
   }
   table.grade-range-table tr:last-child td{ border-bottom:none; }
-  table.grade-range-table tr.highlight td{
-    background:#fff7c2; font-weight:700; color:var(--text);
+  table.grade-range-table tr.highlight td{ background:#fefce8; font-weight:700; color:var(--text); }
+  table.grade-range-table tr.achieved td{ background:var(--success-bg); color:var(--success); }
+  table.grade-range-table tr.impossible td{ background:var(--error-bg); color:var(--error); }
+  table.grade-range-table tr.highlight.achieved td{ background:#d1fae5; color:var(--success); }
+  table.grade-range-table tr.highlight.impossible td{ background:#fee2e2; color:var(--error); }
+
+  /* ── Error box ── */
+  .error-box{
+    display:flex; gap:9px; align-items:flex-start;
+    border:1.5px solid var(--error-border); background:var(--error-bg);
+    color:var(--error); padding:12px 14px; border-radius:var(--radius-sm);
+    font-size:.87rem;
   }
-  table.grade-range-table tr.achieved td{
-    background:var(--success-bg); color:var(--success);
+  .error-box svg{ width:16px; height:16px; flex-shrink:0; margin-top:1px; }
+
+  /* ── Assessment info card ── */
+  .info-card{
+    background:var(--surface);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    overflow:hidden;
+    margin-bottom:16px;
   }
-  table.grade-range-table tr.impossible td{
-    background:var(--error-bg); color:var(--error);
+  .info-card summary{
+    list-style:none; display:flex; align-items:center; justify-content:space-between;
+    padding:14px 18px; cursor:pointer; user-select:none;
+    font-size:.86rem; font-weight:700; color:var(--text2);
   }
-  table.grade-range-table tr.highlight.achieved td{
-    background:#cdebd5; color:var(--success);
+  .info-card summary::-webkit-details-marker{ display:none; }
+  .info-card summary .summary-left{ display:flex; align-items:center; gap:8px; }
+  .info-card summary svg{ width:16px; height:16px; color:var(--primary); }
+  .info-card summary .chevron{
+    width:16px; height:16px; color:var(--muted);
+    transition:transform var(--transition);
   }
-  table.grade-range-table tr.highlight.impossible td{
-    background:#facaca; color:var(--error);
+  .info-card[open] summary .chevron{ transform:rotate(180deg); }
+  .info-card-body{ padding:0 18px 16px; }
+
+  .assessment-grid{
+    display:grid; gap:8px;
+    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    margin-bottom:14px;
+  }
+  .assess-row{
+    display:flex; align-items:center; justify-content:space-between;
+    background:var(--bg); border-radius:8px; padding:8px 12px;
+    font-size:.82rem;
+  }
+  .assess-row-label{ color:var(--text2); font-weight:500; }
+  .assess-row-pct{ font-weight:700; color:var(--primary); font-size:.88rem; }
+  .assess-row.total{ background:var(--primary-tint); }
+  .assess-row.total .assess-row-label{ font-weight:700; color:var(--primary-dark); }
+  .assess-row.total .assess-row-pct{ color:var(--primary-dark); }
+
+  .grading-table{ width:100%; border-collapse:collapse; font-size:.83rem; margin-top:8px; }
+  .grading-table th, .grading-table td{
+    padding:7px 10px; text-align:center;
+    border-bottom:1px solid var(--border);
+  }
+  .grading-table th{
+    background:var(--bg); color:var(--muted);
+    font-weight:700; text-transform:uppercase;
+    font-size:.68rem; letter-spacing:.4px;
   }
 
+  /* ── Footer ── */
+  footer.credit{
+    text-align:center; margin-top:8px;
+    display:flex; flex-direction:column; align-items:center; gap:10px;
+  }
+  footer.credit p{ color:var(--muted); font-size:.82rem; }
+  .social-button{
+    display:inline-flex; align-items:center; gap:7px;
+    background:var(--primary); color:#fff;
+    padding:9px 18px; border-radius:999px;
+    text-decoration:none; font-size:.83rem; font-weight:600;
+    box-shadow:0 2px 8px rgba(79,70,229,.3);
+    transition:background var(--transition);
+  }
+  .social-button:hover{ background:var(--primary-dark); }
+
+  /* ── Download popup ── */
+  .download-popup{
+    position:fixed; inset:0;
+    background:rgba(17,24,39,.5);
+    backdrop-filter:blur(4px);
+    display:flex; align-items:center; justify-content:center; padding:20px;
+    opacity:0; visibility:hidden; z-index:1000;
+    transition:opacity .2s, visibility .2s;
+  }
+  .download-popup.active{ opacity:1; visibility:visible; }
+  .download-content{
+    background:#fff; border-radius:var(--radius);
+    padding:28px; max-width:360px; width:100%;
+    box-shadow:var(--shadow-md); text-align:center;
+    transform:translateY(10px);
+    transition:transform .2s;
+  }
+  .download-popup.active .download-content{ transform:translateY(0); }
+  .download-content h3{ margin-bottom:6px; font-size:1.1rem; }
+  .download-content p{ color:var(--muted); font-size:.87rem; margin-bottom:20px; }
+  .download-buttons{ display:flex; gap:10px; }
+  .download-buttons button{
+    flex:1; padding:11px; border:none; border-radius:var(--radius-sm);
+    font-weight:700; cursor:pointer; font-family:inherit; font-size:.9rem;
+    transition:background var(--transition);
+  }
+  .download-buttons .confirm{ background:var(--primary); color:#fff; }
+  .download-buttons .confirm:hover{ background:var(--primary-dark); }
+  .download-buttons .cancel{ background:var(--bg); color:var(--text); }
+  .download-buttons .cancel:hover{ background:var(--border); }
+
+  /* ── Auth Bar in Hero ── */
+  .auth-bar{
+    display:flex; justify-content:center; align-items:center;
+    margin-top:14px; position:relative;
+  }
+  .btn-auth{
+    display:inline-flex; align-items:center; gap:8px;
+    background:rgba(255,255,255,.2);
+    border:1.5px solid rgba(255,255,255,.35);
+    color:#fff; border-radius:999px;
+    padding:8px 18px; font-size:.84rem; font-weight:700;
+    cursor:pointer; font-family:inherit;
+    backdrop-filter:blur(6px);
+    transition:background var(--transition), transform var(--transition);
+  }
+  .btn-auth:hover{ background:rgba(255,255,255,.3); transform:translateY(-1px); }
+  .btn-auth svg{ width:16px; height:16px; }
+
+  .auth-user{
+    display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:center;
+  }
+  .user-pill{
+    display:flex; align-items:center; gap:8px;
+    background:rgba(255,255,255,.2);
+    border:1px solid rgba(255,255,255,.3);
+    border-radius:999px; padding:4px 12px 4px 5px;
+    backdrop-filter:blur(6px);
+  }
+  .user-photo{
+    width:28px; height:28px; border-radius:50%; object-fit:cover;
+  }
+  .user-photo-fallback{
+    width:28px; height:28px; border-radius:50%;
+    background:#fff; color:var(--primary);
+    font-weight:800; font-size:.82rem;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .user-meta{ display:flex; flex-direction:column; line-height:1.2; text-align:left; }
+  .user-name{ font-size:.84rem; font-weight:700; color:#fff; max-width:140px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .user-cloud-status{ font-size:.66rem; opacity:.9; color:#a7f3d0; }
+
+  .btn-signout{
+    background:rgba(0,0,0,.25); border:1px solid rgba(255,255,255,.25);
+    color:#fff; border-radius:999px; padding:6px 13px; font-size:.76rem;
+    font-weight:700; cursor:pointer; font-family:inherit;
+    transition:background var(--transition);
+  }
+  .btn-signout:hover{ background:rgba(220,38,38,.75); }
+
+  /* ── Save Marks Button in Actions ── */
+  .btn-save{
+    background:#059669; color:#fff;
+    box-shadow:0 4px 14px rgba(5,150,105,.3);
+  }
+  .btn-save:hover{ background:#047857; }
+  .btn-save:disabled{ opacity:.6; cursor:not-allowed; }
+
+  /* ── Auth Modal ── */
+  .auth-modal-overlay{
+    position:fixed; inset:0;
+    background:rgba(15,23,42,.6);
+    backdrop-filter:blur(5px);
+    display:flex; align-items:center; justify-content:center;
+    padding:16px; z-index:10000;
+    opacity:0; visibility:hidden;
+    transition:opacity .2s, visibility .2s;
+  }
+  .auth-modal-overlay.active{ opacity:1; visibility:visible; }
+  .auth-modal-card{
+    background:#ffffff; border-radius:18px;
+    padding:26px 24px; max-width:390px; width:100%;
+    box-shadow:0 20px 25px -5px rgba(0,0,0,.15),0 10px 10px -5px rgba(0,0,0,.04);
+    position:relative; transform:scale(.95);
+    transition:transform .2s;
+  }
+  .auth-modal-overlay.active .auth-modal-card{ transform:scale(1); }
+  .auth-close-btn{
+    position:absolute; top:14px; right:14px;
+    background:var(--bg); border:none; width:30px; height:30px;
+    border-radius:50%; font-size:1.2rem; line-height:1;
+    color:var(--muted); cursor:pointer; display:flex; align-items:center; justify-content:center;
+  }
+  .auth-close-btn:hover{ background:var(--error-bg); color:var(--error); }
+  .auth-header{ text-align:center; margin-bottom:18px; }
+  .auth-mini-logo{ width:48px; height:48px; border-radius:50%; margin-bottom:8px; }
+  .auth-header h3{ font-size:1.25rem; font-weight:800; color:var(--text); }
+  .auth-header p{ font-size:.82rem; color:var(--muted); margin-top:2px; }
+
+  .btn-google{
+    width:100%; display:flex; align-items:center; justify-content:center; gap:10px;
+    padding:11px 16px; border:1.5px solid var(--border2);
+    border-radius:10px; background:#fff; color:var(--text2);
+    font-size:.9rem; font-weight:700; cursor:pointer; font-family:inherit;
+    transition:background var(--transition), border-color var(--transition);
+  }
+  .btn-google:hover{ background:#f9fafb; border-color:#9ca3af; }
+  .google-icon{ width:20px; height:20px; }
+
+  .auth-divider{
+    display:flex; align-items:center; margin:16px 0;
+    color:var(--muted); font-size:.74rem; font-weight:600; text-transform:uppercase; letter-spacing:.5px;
+  }
+  .auth-divider::before, .auth-divider::after{
+    content:''; flex:1; height:1px; background:var(--border);
+  }
+  .auth-divider span{ padding:0 10px; }
+
+  .auth-tabs{
+    display:flex; background:var(--bg); border-radius:999px; padding:3px; gap:3px; margin-bottom:14px;
+  }
+  .auth-tab{
+    flex:1; border:none; background:transparent; padding:8px 6px;
+    border-radius:999px; font-size:.8rem; font-weight:700; color:var(--muted);
+    cursor:pointer; font-family:inherit; transition:background var(--transition), color var(--transition);
+  }
+  .auth-tab.active{
+    background:#fff; color:var(--primary); box-shadow:0 1px 3px rgba(0,0,0,.1);
+  }
+
+  .auth-field{ margin-bottom:12px; }
+  .auth-field label{ display:block; font-size:.76rem; font-weight:700; color:var(--text2); margin-bottom:4px; }
+  .auth-field input{
+    width:100%; padding:10px 12px; border:1.5px solid var(--border2);
+    border-radius:8px; font-size:.92rem; font-family:inherit;
+    transition:border-color var(--transition);
+  }
+  .auth-field input:focus{ outline:none; border-color:var(--primary); box-shadow:0 0 0 3px rgba(79,70,229,.12); }
+
+  .auth-error-box{
+    background:var(--error-bg); border:1px solid var(--error-border);
+    color:var(--error); padding:8px 12px; border-radius:8px;
+    font-size:.8rem; margin-bottom:12px; line-height:1.4;
+  }
+
+  .btn-auth-submit{
+    width:100%; padding:12px; border:none; border-radius:10px;
+    background:var(--primary); color:#fff; font-size:.92rem; font-weight:700;
+    cursor:pointer; font-family:inherit; transition:background var(--transition);
+  }
+  .btn-auth-submit:hover{ background:var(--primary-dark); }
+  .btn-auth-submit:disabled{ opacity:.6; cursor:not-allowed; }
+
+  .auth-footer-links{ text-align:center; margin-top:10px; }
+  .link-btn{
+    background:none; border:none; color:var(--primary); font-size:.78rem; font-weight:600;
+    cursor:pointer; font-family:inherit; text-decoration:underline;
+  }
+  .link-btn:hover{ color:var(--primary-dark); }
+
+  /* ── Toast Notification ── */
+  .toast-notification{
+    position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(40px);
+    background:#1f2937; color:#fff; padding:12px 22px; border-radius:999px;
+    font-size:.86rem; font-weight:600; box-shadow:0 10px 25px -5px rgba(0,0,0,.3);
+    z-index:99999; opacity:0; pointer-events:none;
+    transition:transform .25s cubic-bezier(.4,0,.2,1), opacity .25s;
+    max-width:90vw; text-align:center;
+  }
+  .toast-notification.show{ transform:translateX(-50%) translateY(0); opacity:1; }
+  .toast-notification.success{ background:#065f46; border:1px solid #34d399; }
+  .toast-notification.error{ background:#991b1b; border:1px solid #f87171; }
+  .toast-notification.warn{ background:#92400e; border:1px solid #fbbf24; }
+  .toast-notification.info{ background:#1e40af; border:1px solid #60a5fa; }
+
+  /* ── Responsive ── */
+  @media(min-width:600px){
+    .shell{ padding:28px 20px 48px; }
+    .hero{ padding:36px 32px 28px; }
+    .card{ padding:24px; }
+  }
+  @media(max-width:480px){
+    .ct-grid{ gap:6px; }
+    .ct-col{ padding:6px 4px; }
+    .ct-field-label{ font-size:.68rem; margin-bottom:4px; }
+    .tag-score, .tag-max{ font-size:.58rem; padding:1px 3px; }
+    input[type="number"].ct-score-input, input[type="number"].ct-max-input{
+      padding:6px 2px;
+      font-size:.85rem;
+    }
+  }
+  @media(max-width:340px){
+    .ct-grid{ grid-template-columns:1fr; }
+  }
+  @media(prefers-reduced-motion:reduce){
+    *{ transition:none !important; animation:none !important; }
+  }
 </style>
 </head>
 <body>
-  <div class="page">
-    <header class="top">
-      <h1>BUP CGPA Calculator</h1>
-      <p class="subtitle">Find the final exam score you need for your target grade</p>
-    </header>
+<div class="shell">
 
-    <main class="main-card">
-      <p class="info-line">Weightage: 60% in-course + 40% final exam. The 4 Class Tests (out of 40 total) convert to 10 marks.</p>
+  <!-- Hero -->
+  <header class="hero">
+    <img src="buplogo.png" alt="BUP Logo" class="hero-logo">
+    <h1>BUP CGPA Calculator</h1>
+    <p class="tagline">Find the final exam score needed to hit your target grade</p>
+    <div class="hero-pills">
+      <span class="hero-pill">BBA · Management</span>
+      <span class="hero-pill">50% Final + 50% In-Course</span>
+      <span class="hero-pill">Best 2 of 3 CTs</span>
+    </div>
 
-      <div class="mode-switch">
-        <input type="radio" name="mode" id="modeSingle" checked>
-        <label for="modeSingle">Single Course</label>
-        <input type="radio" name="mode" id="modeMultiple">
-        <label for="modeMultiple">Multiple Courses</label>
-        <input type="radio" name="mode" id="modeDirect">
-        <label for="modeDirect">Direct In-Course Mark</label>
-      </div>
-      <p class="mode-hint" id="modeHint"></p>
-
-      <section class="picker" id="multiPicker" hidden>
-        <div class="field">
-          <label for="semesterSelect">Semester</label>
-          <select id="semesterSelect"></select>
-        </div>
-        <p class="info-note semester-note">Semester &amp; course names are according to the BBA in Management Dept. You can edit any course name below if needed.</p>
-      </section>
-
-      <section id="coursesContainer" class="courses">
-        <p class="empty-hint" id="emptyHint">Select a semester above to load its courses.</p>
-      </section>
-
-      <div class="actions">
-        <button type="button" id="calculateBtn" class="btn btn-primary">Calculate</button>
-        <button type="button" id="downloadBtn" class="btn btn-secondary" hidden>Download Result</button>
+    <!-- Student Auth Bar -->
+    <div class="auth-bar">
+      <div id="authGuest" class="auth-guest">
+        <button type="button" class="btn-auth" id="openAuthModalBtn">
+          <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/></svg>
+          <span>Student Sign In / Register</span>
+        </button>
       </div>
 
-      <section id="resultsSection" class="results" hidden aria-live="polite"></section>
-
-      <details class="grading-details">
-        <summary>Grading scale &amp; details</summary>
-        <div class="info-note">
-          <p>Final grade = 60% in-course work + 40% final exam.</p>
-          <p>Each Class Test contributes up to 2.5 marks (score &divide; out-of &times; 2.5), for up to 10 marks total from 4 CTs.</p>
+      <div id="authUser" class="auth-user" hidden>
+        <div class="user-pill">
+          <img id="userPhoto" class="user-photo" src="" alt="Photo" style="display:none">
+          <div id="userPhotoFallback" class="user-photo-fallback">👤</div>
+          <div class="user-meta">
+            <span id="userDisplayName" class="user-name">Student</span>
+            <span id="userCloudStatus" class="user-cloud-status">● Cloud Synced</span>
+          </div>
         </div>
-        <table class="grading-table">
-          <thead><tr><th>Marks</th><th>Grade</th><th>GPA</th></tr></thead>
-          <tbody>
-            <tr><td>80-100</td><td>A+</td><td>4.00</td></tr>
-            <tr><td>75-79</td><td>A</td><td>3.75</td></tr>
-            <tr><td>70-74</td><td>A-</td><td>3.50</td></tr>
-            <tr><td>65-69</td><td>B+</td><td>3.25</td></tr>
-            <tr><td>60-64</td><td>B</td><td>3.00</td></tr>
-            <tr><td>55-59</td><td>B-</td><td>2.75</td></tr>
-            <tr><td>50-54</td><td>C+</td><td>2.50</td></tr>
-            <tr><td>45-49</td><td>C</td><td>2.25</td></tr>
-            <tr><td>40-44</td><td>D</td><td>2.00</td></tr>
-            <tr><td>0-39</td><td>F</td><td>0.00</td></tr>
-          </tbody>
-        </table>
-      </details>
-    </main>
+        <button type="button" class="btn-signout" id="signOutBtn" title="Sign Out">Sign Out</button>
+      </div>
+    </div>
+  </header>
 
-    <footer class="credit">
-      <p>Created by <strong>Muztaba Rafid Mahi</strong></p>
-      <a href="https://www.facebook.com/Muztaba.Rafid.Mahi" target="_blank" class="social-button">📘 Connect on Facebook</a>
-    </footer>
+  <!-- Mode card -->
+  <div class="card">
+    <div class="card-title">
+      <svg viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M5 4a2 2 0 012-2h6a2 2 0 012 2v14l-5-2.5L5 18V4z"/></svg>
+      Calculator Mode
+    </div>
+
+    <div class="mode-tabs">
+      <input type="radio" name="mode" id="modeSingle" checked>
+      <label for="modeSingle">📘 Single Course</label>
+      <input type="radio" name="mode" id="modeMultiple">
+      <label for="modeMultiple">📚 By Semester</label>
+      <input type="radio" name="mode" id="modeDirect">
+      <label for="modeDirect">⚡ Quick Entry</label>
+    </div>
+
+    <div class="mode-desc" id="modeDesc">
+      <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/></svg>
+      <span id="modeDescText"></span>
+    </div>
+
+    <!-- Semester picker (multiple mode) -->
+    <div class="semester-wrap" id="multiPicker" hidden>
+      <label class="sem-label" for="semesterSelect">
+        Select Semester
+        <span>— course names can be edited below</span>
+      </label>
+      <select id="semesterSelect"></select>
+    </div>
   </div>
 
-  <template id="courseCardTemplate">
-    <div class="course-card">
-      <div class="course-card-head">
-        <div class="course-name-wrap">
-          <span class="course-code"></span>
-          <input type="text" class="course-name" aria-label="Course name">
-        </div>
-        <button type="button" class="remove-btn" aria-label="Remove course">&times;</button>
-      </div>
-
-      <div class="ct-grid">
-        <div class="ct-field">
-          <span class="ct-field-label">CT 1</span>
-          <div class="ct-pair">
-            <input type="number" class="ct1-score" min="0" step="any" value="0" inputmode="decimal" aria-label="CT1 score">
-            <span>/</span>
-            <input type="number" class="ct1-max" min="0.01" step="any" value="10" inputmode="decimal" aria-label="CT1 out of">
-          </div>
-        </div>
-        <div class="ct-field">
-          <span class="ct-field-label">CT 2</span>
-          <div class="ct-pair">
-            <input type="number" class="ct2-score" min="0" step="any" value="0" inputmode="decimal" aria-label="CT2 score">
-            <span>/</span>
-            <input type="number" class="ct2-max" min="0.01" step="any" value="10" inputmode="decimal" aria-label="CT2 out of">
-          </div>
-        </div>
-        <div class="ct-field">
-          <span class="ct-field-label">CT 3</span>
-          <div class="ct-pair">
-            <input type="number" class="ct3-score" min="0" step="any" value="0" inputmode="decimal" aria-label="CT3 score">
-            <span>/</span>
-            <input type="number" class="ct3-max" min="0.01" step="any" value="10" inputmode="decimal" aria-label="CT3 out of">
-          </div>
-        </div>
-        <div class="ct-field">
-          <span class="ct-field-label">CT 4</span>
-          <div class="ct-pair">
-            <input type="number" class="ct4-score" min="0" step="any" value="0" inputmode="decimal" aria-label="CT4 score">
-            <span>/</span>
-            <input type="number" class="ct4-max" min="0.01" step="any" value="10" inputmode="decimal" aria-label="CT4 out of">
-          </div>
-        </div>
-      </div>
-
-      <div class="fields-grid">
-        <label class="field-box">
-          <span>Mid Term <small>/20</small></span>
-          <input type="number" class="midTerm" min="0" max="20" step="any" value="0" inputmode="decimal">
-        </label>
-        <label class="field-box">
-          <span>Assignments <small>/10</small></span>
-          <input type="number" class="assignments" min="0" max="10" step="any" value="0" inputmode="decimal">
-        </label>
-        <label class="field-box">
-          <span>Project <small>/10</small></span>
-          <input type="number" class="project" min="0" max="10" step="any" value="0" inputmode="decimal">
-        </label>
-        <label class="field-box">
-          <span>Attendance <small>/10</small></span>
-          <input type="number" class="attendance" min="0" max="10" step="any" value="0" inputmode="decimal">
-        </label>
-      </div>
-
-      <label class="field-box">
-        <span>Desired GPA</span>
-        <select class="desiredGpa">
-          <option value="4.00">4.00 — A+</option>
-          <option value="3.75">3.75 — A</option>
-          <option value="3.50">3.50 — A-</option>
-          <option value="3.25">3.25 — B+</option>
-          <option value="3.00">3.00 — B</option>
-          <option value="2.75">2.75 — B-</option>
-          <option value="2.50">2.50 — C+</option>
-          <option value="2.25">2.25 — C</option>
-          <option value="2.00">2.00 — D</option>
-        </select>
-      </label>
+  <!-- Courses -->
+  <section id="coursesContainer" class="courses">
+    <div class="empty-hint" id="emptyHint">
+      <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="8" y="8" width="32" height="32" rx="4"/>
+        <path d="M16 24h16M24 16v16"/>
+      </svg>
+      <span>Select a semester above to load courses</span>
     </div>
-  </template>
+  </section>
 
-  <template id="directCardTemplate">
-    <div class="course-card direct-card">
-      <div class="course-card-head">
-        <div class="course-name-wrap">
-          <span class="course-code"></span>
-          <input type="text" class="course-name" aria-label="Course name">
+  <!-- Actions -->
+  <div class="actions">
+    <button type="button" id="calculateBtn" class="btn btn-primary">
+      <svg viewBox="0 0 20 20" fill="currentColor"><path d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V7.414A2 2 0 0015.414 6L12 2.586A2 2 0 0010.586 2H6zm5 6a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V8z"/></svg>
+      Calculate
+    </button>
+    <button type="button" id="saveMarksBtn" class="btn btn-save">
+      <svg viewBox="0 0 20 20" fill="currentColor"><path d="M7.707 10.293a1 1 0 10-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L11 11.586V6h5a2 2 0 012 2v7a2 2 0 01-2 2H4a2 2 0 01-2-2V8a2 2 0 012-2h5v5.586l-1.293-1.293zM9 4a1 1 0 012 0v2H9V4z"/></svg>
+      <span id="saveBtnText">Save to Cloud</span>
+    </button>
+    <button type="button" id="downloadBtn" class="btn btn-secondary" hidden>
+      <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+      Download Result
+    </button>
+  </div>
+
+  <!-- Results -->
+  <section id="resultsSection" class="results-section" hidden aria-live="polite"></section>
+
+  <!-- Assessment info (collapsible) -->
+  <details class="info-card">
+    <summary>
+      <span class="summary-left">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V4a2 2 0 00-2-2H6zm1 2a1 1 0 000 2h6a1 1 0 100-2H7zm6 7a1 1 0 011 1v3a1 1 0 11-2 0v-3a1 1 0 011-1zm-3 3a1 1 0 100 2h.01a1 1 0 100-2H10zm-4 1a1 1 0 011-1h.01a1 1 0 110 2H7a1 1 0 01-1-1zm1-4a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/></svg>
+        Assessment Strategy &amp; Grading Scale
+      </span>
+      <svg class="chevron" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/></svg>
+    </summary>
+    <div class="info-card-body">
+      <div class="assessment-grid">
+        <div class="assess-row"><span class="assess-row-label">🏆 Final Exam</span><span class="assess-row-pct">50%</span></div>
+        <div class="assess-row"><span class="assess-row-label">📝 Mid-term (1)</span><span class="assess-row-pct">20%</span></div>
+        <div class="assess-row"><span class="assess-row-label">✏️ Class Test (3) Best 2</span><span class="assess-row-pct">10%</span></div>
+        <div class="assess-row"><span class="assess-row-label">📄 Assignments / Presentation</span><span class="assess-row-pct">10%</span></div>
+        <div class="assess-row"><span class="assess-row-label">📅 Attendance &amp; Class Perf.</span><span class="assess-row-pct">10%</span></div>
+        <div class="assess-row total"><span class="assess-row-label">Total</span><span class="assess-row-pct">100%</span></div>
+      </div>
+      <table class="grading-table">
+        <thead><tr><th>Marks (%)</th><th>Grade</th><th>GPA</th></tr></thead>
+        <tbody>
+          <tr><td>80 – 100</td><td>A+</td><td>4.00</td></tr>
+          <tr><td>75 – 79</td><td>A</td><td>3.75</td></tr>
+          <tr><td>70 – 74</td><td>A-</td><td>3.50</td></tr>
+          <tr><td>65 – 69</td><td>B+</td><td>3.25</td></tr>
+          <tr><td>60 – 64</td><td>B</td><td>3.00</td></tr>
+          <tr><td>55 – 59</td><td>B-</td><td>2.75</td></tr>
+          <tr><td>50 – 54</td><td>C+</td><td>2.50</td></tr>
+          <tr><td>45 – 49</td><td>C</td><td>2.25</td></tr>
+          <tr><td>40 – 44</td><td>D</td><td>2.00</td></tr>
+          <tr><td>0 – 39</td><td>F</td><td>0.00</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </details>
+
+  <footer class="credit">
+    <p>Created by <strong>Muztaba Rafid Mahi</strong></p>
+    <a href="https://www.facebook.com/Muztaba.Rafid.Mahi" target="_blank" rel="noopener" class="social-button">📘 Connect on Facebook</a>
+  </footer>
+</div>
+
+<!-- Templates -->
+<template id="courseCardTemplate">
+  <div class="course-card">
+    <div class="course-card-head">
+      <div class="course-icon">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path d="M9 4.804A7.968 7.968 0 005.5 4c-1.255 0-2.443.29-3.5.804v10A7.969 7.969 0 015.5 14c1.669 0 3.218.51 4.5 1.385A7.962 7.962 0 0114.5 14c1.255 0 2.443.29 3.5.804v-10A7.968 7.968 0 0014.5 4c-1.255 0-2.443.29-3.5.804V12a1 1 0 11-2 0V4.804z"/></svg>
+      </div>
+      <div class="course-name-wrap">
+        <span class="course-code-badge course-code" style="display:none"></span>
+        <input type="text" class="course-name" aria-label="Course name" placeholder="Course name">
+      </div>
+      <button type="button" class="remove-btn" aria-label="Remove course">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+      </button>
+    </div>
+
+    <div class="course-card-body">
+      <!-- CTs -->
+      <div>
+        <div class="section-hdr">
+          <svg width="13" height="13" viewBox="0 0 20 20" fill="currentColor"><path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/></svg>
+          Class Tests
+          <span class="badge-pill">Best 2 of 3 → 10 marks</span>
+          <span class="ct-legend">
+            <span><span class="dot-score">●</span> Score</span>
+            <span><span class="dot-max">●</span> Full Mark</span>
+          </span>
         </div>
-        <button type="button" class="remove-btn" aria-label="Remove course">&times;</button>
+        <div class="ct-grid">
+          <div class="ct-col">
+            <div class="ct-field-label">
+              <span>CT 1</span>
+              <div class="ct-label-tags"><span class="tag-score">Score</span><span class="tag-sep">/</span><span class="tag-max">Full</span></div>
+            </div>
+            <div class="ct-pair">
+              <input type="number" class="ct1-score ct-score-input" min="0" step="any" value="0" inputmode="decimal" aria-label="CT1 score" title="Obtained marks">
+              <span class="ct-sep">/</span>
+              <input type="number" class="ct1-max ct-max-input" min="0.01" step="any" value="10" inputmode="decimal" aria-label="CT1 max" title="Full / Out of marks">
+            </div>
+          </div>
+          <div class="ct-col">
+            <div class="ct-field-label">
+              <span>CT 2</span>
+              <div class="ct-label-tags"><span class="tag-score">Score</span><span class="tag-sep">/</span><span class="tag-max">Full</span></div>
+            </div>
+            <div class="ct-pair">
+              <input type="number" class="ct2-score ct-score-input" min="0" step="any" value="0" inputmode="decimal" aria-label="CT2 score" title="Obtained marks">
+              <span class="ct-sep">/</span>
+              <input type="number" class="ct2-max ct-max-input" min="0.01" step="any" value="10" inputmode="decimal" aria-label="CT2 max" title="Full / Out of marks">
+            </div>
+          </div>
+          <div class="ct-col">
+            <div class="ct-field-label">
+              <span>CT 3</span>
+              <div class="ct-label-tags"><span class="tag-score">Score</span><span class="tag-sep">/</span><span class="tag-max">Full</span></div>
+            </div>
+            <div class="ct-pair">
+              <input type="number" class="ct3-score ct-score-input" min="0" step="any" value="0" inputmode="decimal" aria-label="CT3 score" title="Obtained marks">
+              <span class="ct-sep">/</span>
+              <input type="number" class="ct3-max ct-max-input" min="0.01" step="any" value="10" inputmode="decimal" aria-label="CT3 max" title="Full / Out of marks">
+            </div>
+          </div>
+        </div>
       </div>
 
+      <!-- Other marks -->
+      <div>
+        <div class="section-hdr">
+          <svg width="13" height="13" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M6 2a2 2 0 00-2 2v12a2 2 0 002 2h8a2 2 0 002-2V4a2 2 0 00-2-2H6zm1 2a1 1 0 000 2h6a1 1 0 100-2H7zm6 7a1 1 0 011 1v3a1 1 0 11-2 0v-3a1 1 0 011-1zm-3 3a1 1 0 100 2h.01a1 1 0 100-2H10zm-4 1a1 1 0 011-1h.01a1 1 0 110 2H7a1 1 0 01-1-1zm1-4a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/></svg>
+          Other Components
+        </div>
+        <div class="marks-grid">
+          <label class="mark-field mark-field-midterm">
+            <div class="mark-label">
+              <span>📝 Mid-term (1)</span>
+              <span class="out-of out-of-midterm">out of 20</span>
+            </div>
+            <input type="number" class="midTerm input-midterm" min="0" max="20" step="any" value="0" inputmode="decimal">
+          </label>
+          <label class="mark-field mark-field-assignments">
+            <div class="mark-label">
+              <span>📄 Assignments / Pres.</span>
+              <span class="out-of out-of-assignments">out of 10</span>
+            </div>
+            <input type="number" class="assignments input-assignments" min="0" max="10" step="any" value="0" inputmode="decimal">
+          </label>
+          <label class="mark-field mark-field-attendance" style="grid-column:1/-1">
+            <div class="mark-label">
+              <span>📅 Attendance &amp; Class Perf.</span>
+              <span class="out-of out-of-attendance">out of 10</span>
+            </div>
+            <input type="number" class="attendance input-attendance" min="0" max="10" step="any" value="0" inputmode="decimal">
+          </label>
+        </div>
+      </div>
+
+      <!-- Live in-course bar -->
+      <div class="live-bar-wrap">
+        <div class="live-bar-top">
+          <span class="live-bar-label">In-course total (live preview)</span>
+          <span class="live-bar-score live-score-text">0 / 50</span>
+        </div>
+        <div class="live-bar-track">
+          <div class="live-bar-fill" style="width:0%"></div>
+        </div>
+      </div>
+
+      <!-- Desired GPA -->
+      <div class="gpa-row">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+        <label for="">Target GPA</label>
+        <select class="desiredGpa">
+          <option value="4.00">4.00 — A+  (80%+)</option>
+          <option value="3.75">3.75 — A   (75-79%)</option>
+          <option value="3.50">3.50 — A-  (70-74%)</option>
+          <option value="3.25">3.25 — B+  (65-69%)</option>
+          <option value="3.00">3.00 — B   (60-64%)</option>
+          <option value="2.75">2.75 — B-  (55-59%)</option>
+          <option value="2.50">2.50 — C+  (50-54%)</option>
+          <option value="2.25">2.25 — C   (45-49%)</option>
+          <option value="2.00">2.00 — D   (40-44%)</option>
+        </select>
+      </div>
+    </div>
+  </div>
+</template>
+
+<template id="directCardTemplate">
+  <div class="course-card direct-card">
+    <div class="course-card-head">
+      <div class="course-icon">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"/></svg>
+      </div>
+      <div class="course-name-wrap">
+        <span class="course-code-badge course-code" style="display:none"></span>
+        <input type="text" class="course-name" aria-label="Course name" placeholder="Course name">
+      </div>
+      <button type="button" class="remove-btn" aria-label="Remove course">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+      </button>
+    </div>
+    <div class="course-card-body">
       <div class="direct-grid">
-        <label class="field-box">
-          <span>In-course mark <small>/60</small></span>
-          <input type="number" class="inCourseDirect" min="0" max="60" step="any" value="0" inputmode="decimal">
+        <label class="mark-field mark-field-direct">
+          <div class="mark-label">
+            <span>⚡ Total In-course Mark</span>
+            <span class="out-of out-of-direct">out of 50</span>
+          </div>
+          <input type="number" class="inCourseDirect input-direct" min="0" max="50" step="any" value="0" inputmode="decimal">
         </label>
-        <label class="field-box">
-          <span>Desired GPA</span>
+        <div class="gpa-row" style="align-self:end">
+          <svg viewBox="0 0 20 20" fill="currentColor"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          <label>Target GPA</label>
           <select class="desiredGpa">
             <option value="4.00">4.00 — A+</option>
             <option value="3.75">3.75 — A</option>
@@ -436,574 +1257,1032 @@
             <option value="2.25">2.25 — C</option>
             <option value="2.00">2.00 — D</option>
           </select>
-        </label>
-      </div>
-    </div>
-  </template>
-
-  <div id="downloadPopup" class="download-popup">
-    <div class="download-content">
-      <h3>Download Results</h3>
-      <p>This saves your current results as an image.</p>
-      <div class="download-buttons">
-        <button type="button" class="confirm" id="confirmDownloadBtn">Download</button>
-        <button type="button" class="cancel" id="cancelDownloadBtn">Cancel</button>
+        </div>
       </div>
     </div>
   </div>
+</template>
 
-  <script>
-    // ---------- Course catalogue ----------
-    const COURSES = {
-      1: {
-        1: [
-          { code:'GED 1101', name:'Functional English and Presentation Skill Development' },
-          { code:'GED 1102', name:'Bangladesh Studies' },
-          { code:'ALD 1101', name:'Principles of Marketing' },
-          { code:'ALD 1102', name:'Introduction to Business' },
-          { code:'MGT 1101', name:'Principles of Management' }
-        ],
-        2: [
-          { code:'GED 1201', name:'Business Communication' },
-          { code:'ALD 1201', name:'Microeconomics' },
-          { code:'ALD 1202', name:'Business Mathematics' },
-          { code:'ALD 1203', name:'Legal Environment of Business' },
-          { code:'ALD 1204', name:'Principles of Accounting' }
-        ]
-      },
-      2: {
-        1: [
-          { code:'GED 2101', name:'Morality, Ethics and Psychology' },
-          { code:'ALD 2101', name:'Macroeconomics' },
-          { code:'ALD 2102', name:'Business Statistics-I' },
-          { code:'ALD 2103', name:'Principles of Finance' },
-          { code:'MGT 2101', name:'Organizational Behavior' },
-          { code:'MGT 2102', name:'Tourism and Hospitality Management' }
-        ],
-        2: [
-          { code:'ALD 2201', name:'Management Information System' },
-          { code:'ALD 2202', name:'Industrial Law and Employee Relations' },
-          { code:'MGT 2201', name:'Human Resource Management' },
-          { code:'MGT 2202', name:'Auditing and Taxation' },
-          { code:'MGT 2203', name:'Business Statistics-II' }
-        ]
-      },
-      3: {
-        1: [
-          { code:'ALD 3101', name:'Financial Management' },
-          { code:'ALD 3102', name:'Marketing Management' },
-          { code:'ALD 3103', name:'Business Research Methodology' },
-          { code:'MGT 3101', name:'Career Planning and Development' },
-          { code:'MGT 3102', name:'Management Science' }
-        ],
-        2: [
-          { code:'MGT 3201', name:'Econometrics' },
-          { code:'MGT 3202', name:'Operations Management and Technology' },
-          { code:'MGT 3203', name:'Insurance and Bank Management' },
-          { code:'MGT 3204', name:'Business Leadership' },
-          { code:'MGT 3205', name:'Organizational Development and Change Management' }
-        ]
-      },
-      4: {
-        1: [
-          { code:'GED 4101', name:'Foreign Language' },
-          { code:'ALD 4101', name:'Supply Chain Management' },
-          { code:'MGT 4101', name:'Cost and Management Accounting' },
-          { code:'MGT 4102', name:'Innovation & Entrepreneurship Development' },
-          { code:'MGT 4103', name:'Total Quality Management' },
-          { code:'MGT 4104', name:'Textile Management' }
-        ],
-        2: [
-          { code:'ALD 4201', name:'International Business' },
-          { code:'MGT 4201', name:'Strategic Management' },
-          { code:'MGT 4202', name:'Investment Analysis and Portfolio Management' },
-          { code:'MGT 4203', name:'Project Management and New Venture Creation' },
-          { code:'MGT 4204', name:'Artificial Intelligence: Implications for Business Strategy' },
-          { code:'MGT 4898', name:'Internship' },
-          { code:'MGT 4899', name:'Viva-Voce' }
-        ]
+<!-- Download popup -->
+<div id="downloadPopup" class="download-popup">
+  <div class="download-content">
+    <h3>📥 Download Results</h3>
+    <p>Saves your current results as a PNG image.</p>
+    <div class="download-buttons">
+      <button type="button" class="confirm" id="confirmDownloadBtn">Download</button>
+      <button type="button" class="cancel" id="cancelDownloadBtn">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Student Auth Modal -->
+<div id="authModal" class="auth-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+  <div class="auth-modal-card">
+    <button type="button" class="auth-close-btn" id="authCloseBtn" aria-label="Close modal">&times;</button>
+    <div class="auth-header">
+      <img src="buplogo.png" alt="BUP Logo" class="auth-mini-logo">
+      <h3 id="authTitle">Student Portal</h3>
+      <p id="authSubtitle">Sign in to save &amp; sync your marks anywhere</p>
+    </div>
+
+    <button type="button" class="btn-google" id="googleSignInBtn">
+      <svg class="google-icon" viewBox="0 0 24 24">
+        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
+        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
+      </svg>
+      <span>Continue with Google</span>
+    </button>
+
+    <div class="auth-divider"><span>or with email</span></div>
+
+    <div class="auth-tabs" role="tablist">
+      <button type="button" class="auth-tab active" id="tabSignIn">Sign In</button>
+      <button type="button" class="auth-tab" id="tabSignUp">Create Account</button>
+    </div>
+
+    <div id="authError" class="auth-error-box" style="display:none;"></div>
+
+    <form id="authForm" autocomplete="on">
+      <div class="auth-field" id="nameField" style="display:none;">
+        <label for="authName">Full Name</label>
+        <input type="text" id="authName" placeholder="e.g. Rafid Ahmed" autocomplete="name">
+      </div>
+      <div class="auth-field">
+        <label for="authEmail">Email Address</label>
+        <input type="email" id="authEmail" placeholder="student@bup.edu.bd" autocomplete="email" required>
+      </div>
+      <div class="auth-field">
+        <label for="authPassword">Password</label>
+        <input type="password" id="authPassword" placeholder="••••••••" autocomplete="current-password" required minlength="6">
+      </div>
+      <button type="submit" class="btn-auth-submit" id="authSubmitBtn">Sign In</button>
+    </form>
+
+    <div class="auth-footer-links">
+      <button type="button" class="link-btn" id="forgotPasswordBtn">Forgot password?</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast notification -->
+<div id="toastNotification" class="toast-notification"></div>
+
+<script type="module">
+  // ── Firebase Modular SDK 13.3.0 ──
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-analytics.js";
+  import {
+    getAuth,
+    onAuthStateChanged,
+    signInWithPopup,
+    GoogleAuthProvider,
+    signInWithEmailAndPassword,
+    createUserWithEmailAndPassword,
+    updateProfile,
+    sendPasswordResetEmail,
+    signOut
+  } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js";
+  import {
+    getFirestore,
+    doc,
+    setDoc,
+    getDoc
+  } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCVmMVO_vU5Os6KVw0DbzD5pkrvTFgQqiE",
+    authDomain: "bup-cgpa-calculator.firebaseapp.com",
+    projectId: "bup-cgpa-calculator",
+    storageBucket: "bup-cgpa-calculator.firebasestorage.app",
+    messagingSenderId: "962568667899",
+    appId: "1:962568667899:web:8210bfccba9a5d7f40265e",
+    measurementId: "G-FLGT3HHVKF"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  let analytics = null;
+  try { analytics = getAnalytics(app); } catch(e){}
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  let currentUser = null;
+  let authMode = 'signIn'; // 'signIn' or 'signUp'
+
+  // ── Course catalogue ──
+  const COURSES = {
+    1:{
+      1:[
+        {code:'GED 1101',name:'Functional English and Presentation Skill Development'},
+        {code:'GED 1102',name:'Bangladesh Studies'},
+        {code:'ALD 1101',name:'Principles of Marketing'},
+        {code:'ALD 1102',name:'Introduction to Business'},
+        {code:'MGT 1101',name:'Principles of Management'}
+      ],
+      2:[
+        {code:'GED 1201',name:'Business Communication'},
+        {code:'ALD 1201',name:'Microeconomics'},
+        {code:'ALD 1202',name:'Business Mathematics'},
+        {code:'ALD 1203',name:'Legal Environment of Business'},
+        {code:'ALD 1204',name:'Principles of Accounting'}
+      ]
+    },
+    2:{
+      1:[
+        {code:'GED 2101',name:'Morality, Ethics and Psychology'},
+        {code:'ALD 2101',name:'Macroeconomics'},
+        {code:'ALD 2102',name:'Business Statistics-I'},
+        {code:'ALD 2103',name:'Principles of Finance'},
+        {code:'MGT 2101',name:'Organizational Behavior'},
+        {code:'MGT 2102',name:'Tourism and Hospitality Management'}
+      ],
+      2:[
+        {code:'ALD 2201',name:'Management Information System'},
+        {code:'ALD 2202',name:'Industrial Law and Employee Relations'},
+        {code:'MGT 2201',name:'Human Resource Management'},
+        {code:'MGT 2202',name:'Auditing and Taxation'},
+        {code:'MGT 2203',name:'Business Statistics-II'}
+      ]
+    },
+    3:{
+      1:[
+        {code:'ALD 3101',name:'Financial Management'},
+        {code:'ALD 3102',name:'Marketing Management'},
+        {code:'ALD 3103',name:'Business Research Methodology'},
+        {code:'MGT 3101',name:'Career Planning and Development'},
+        {code:'MGT 3102',name:'Management Science'}
+      ],
+      2:[
+        {code:'MGT 3201',name:'Econometrics'},
+        {code:'MGT 3202',name:'Operations Management and Technology'},
+        {code:'MGT 3203',name:'Insurance and Bank Management'},
+        {code:'MGT 3204',name:'Business Leadership'},
+        {code:'MGT 3205',name:'Organizational Development and Change Management'}
+      ]
+    },
+    4:{
+      1:[
+        {code:'GED 4101',name:'Foreign Language'},
+        {code:'ALD 4101',name:'Supply Chain Management'},
+        {code:'MGT 4101',name:'Cost and Management Accounting'},
+        {code:'MGT 4102',name:'Innovation & Entrepreneurship Development'},
+        {code:'MGT 4103',name:'Total Quality Management'},
+        {code:'MGT 4104',name:'Textile Management'}
+      ],
+      2:[
+        {code:'ALD 4201',name:'International Business'},
+        {code:'MGT 4201',name:'Strategic Management'},
+        {code:'MGT 4202',name:'Investment Analysis and Portfolio Management'},
+        {code:'MGT 4203',name:'Project Management and New Venture Creation'},
+        {code:'MGT 4204',name:'Artificial Intelligence: Implications for Business Strategy'},
+        {code:'MGT 4898',name:'Internship'},
+        {code:'MGT 4899',name:'Viva-Voce'}
+      ]
+    }
+  };
+
+  const YEAR_LABELS = {1:'1st Year',2:'2nd Year',3:'3rd Year',4:'4th Year'};
+  const SEM_LABELS  = {1:'1st Semester',2:'2nd Semester'};
+
+  const gradingScale = [
+    {grade:'A+',gpa:4.00,minPercent:80,maxPercent:100},
+    {grade:'A', gpa:3.75,minPercent:75,maxPercent:79},
+    {grade:'A-',gpa:3.50,minPercent:70,maxPercent:74},
+    {grade:'B+',gpa:3.25,minPercent:65,maxPercent:69},
+    {grade:'B', gpa:3.00,minPercent:60,maxPercent:64},
+    {grade:'B-',gpa:2.75,minPercent:55,maxPercent:59},
+    {grade:'C+',gpa:2.50,minPercent:50,maxPercent:54},
+    {grade:'C', gpa:2.25,minPercent:45,maxPercent:49},
+    {grade:'D', gpa:2.00,minPercent:40,maxPercent:44},
+    {grade:'F', gpa:0.00,minPercent:0, maxPercent:39}
+  ];
+
+  function getMinPct(gpa){ const e=gradingScale.find(g=>g.gpa===gpa); return e?e.minPercent:null; }
+
+  // ── Escape HTML ──
+  function esc(s){ const d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+
+  // ── Build grade range table ──
+  function buildGradeRangeTable(inCourse, desiredGpa){
+    const rows = gradingScale.filter(g=>g.gpa>=2.00).map(g=>{
+      const rawMin = (g.minPercent - inCourse) / 0.50;
+      const rawMax = (g.maxPercent + 0.999 - inCourse) / 0.50;
+      let cls=[], d100, d50;
+      if(rawMax<0){
+        cls.push('achieved'); d100='✅ Already secured'; d50='—';
+      } else if(rawMin>100){
+        cls.push('impossible'); d100='❌ Not reachable'; d50='—';
+      } else {
+        const dMin=Math.max(0,rawMin), dMax=Math.min(100,rawMax);
+        const pre=rawMin<=0?'≤ ':'', suf=rawMax>100?'+':'';
+        d100=pre+dMin.toFixed(1)+' – '+dMax.toFixed(1)+suf;
+        d50 =pre+(dMin*0.5).toFixed(1)+' – '+(dMax*0.5).toFixed(1)+suf;
       }
+      if(Math.abs(g.gpa-desiredGpa)<0.001) cls.push('highlight');
+      return `<tr class="${cls.join(' ')}"><td><strong>${g.grade}</strong></td><td>${g.gpa.toFixed(2)}</td><td>${d100}</td><td>${d50}</td></tr>`;
+    }).join('');
+    return `<div class="grade-range-wrap">
+      <div class="grade-range-toggle">
+        <span>📊 Final Exam Score Needed — All Grades</span>
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/></svg>
+      </div>
+      <div class="grade-range-table-wrap">
+        <table class="grade-range-table">
+          <thead><tr><th>Grade</th><th>GPA</th><th>Final (/100)</th><th>Final (/50)</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
+    </div>`;
+  }
+
+  // ── Live bar update ──
+  function updateLiveBar(card){
+    const num=(sel,def)=>{ const v=parseFloat(card.querySelector(sel)?.value); return isNaN(v)?def:v; };
+    const c1=(num('.ct1-score',0)/Math.max(0.01,num('.ct1-max',10)))*5;
+    const c2=(num('.ct2-score',0)/Math.max(0.01,num('.ct2-max',10)))*5;
+    const c3=(num('.ct3-score',0)/Math.max(0.01,num('.ct3-max',10)))*5;
+    const best2=[c1,c2,c3].sort((a,b)=>b-a);
+    const ct=best2[0]+best2[1];
+    const total=ct+num('.midTerm',0)+num('.assignments',0)+num('.attendance',0);
+    const clamped=Math.min(50,Math.max(0,total));
+    const pct=(clamped/50)*100;
+    const fill=card.querySelector('.live-bar-fill');
+    const text=card.querySelector('.live-score-text');
+    if(!fill||!text) return;
+    fill.style.width=pct+'%';
+    text.textContent=clamped.toFixed(2)+' / 50';
+    fill.className='live-bar-fill';
+    if(pct>=80) fill.classList.add('full');
+    else if(pct>=50) fill.classList.add('good');
+    else if(pct>=30) fill.classList.add('warn');
+  }
+
+  // ── Semester select ──
+  function populateSemesterSelect(){
+    const sel=document.getElementById('semesterSelect');
+    const opts=['<option value="">— Choose a semester —</option>'];
+    for(let y=1;y<=4;y++) for(let s=1;s<=2;s++)
+      opts.push(`<option value="${y}-${s}">${YEAR_LABELS[y]} · ${SEM_LABELS[s]}</option>`);
+    sel.innerHTML=opts.join('');
+  }
+
+  function loadCoursesForSemester(){
+    const v=document.getElementById('semesterSelect').value;
+    const c=document.getElementById('coursesContainer');
+    c.querySelectorAll('.course-card').forEach(x=>x.remove());
+    hideResults();
+    if(!v){ checkEmpty(); return; }
+    const [y,s]=v.split('-');
+    COURSES[y][s].forEach(co=>addCourseCard(co,{removable:false}));
+    checkEmpty();
+  }
+
+  // ── Course cards ──
+  function addCourseCard(co, opts={}){
+    const {removable=true, templateId='courseCardTemplate'}=opts;
+    const tpl=document.getElementById(templateId);
+    const frag=tpl.content.cloneNode(true);
+    const card=frag.querySelector('.course-card');
+    card.dataset.code=co.code;
+
+    const codeEl=card.querySelector('.course-code');
+    const nameInput=card.querySelector('.course-name');
+    if(co.code && co.code!=='Custom'){
+      codeEl.textContent=co.code;
+      codeEl.style.display='';
+    }
+    nameInput.value=co.name||'';
+
+    const removeBtn=card.querySelector('.remove-btn');
+    if(removable){
+      removeBtn.addEventListener('click',()=>{ card.remove(); checkEmpty(); hideResults(); });
+    } else {
+      removeBtn.remove();
+    }
+
+    // Live bar on input
+    const inputs=card.querySelectorAll('input[type="number"]');
+    inputs.forEach(inp=>inp.addEventListener('input',()=>updateLiveBar(card)));
+
+    // Grade range table toggle
+    card.addEventListener('click',e=>{
+      const toggle=e.target.closest('.grade-range-toggle');
+      if(!toggle) return;
+      toggle.closest('.grade-range-wrap').classList.toggle('open');
+    });
+
+    document.getElementById('coursesContainer').appendChild(frag);
+    // initial bar
+    const addedCard=document.getElementById('coursesContainer').lastElementChild;
+    if(addedCard) updateLiveBar(addedCard);
+    checkEmpty();
+  }
+
+  function checkEmpty(){
+    const has=document.querySelectorAll('#coursesContainer .course-card').length>0;
+    document.getElementById('emptyHint').hidden=has;
+  }
+
+  function hideResults(){
+    document.getElementById('resultsSection').hidden=true;
+    document.getElementById('downloadBtn').hidden=true;
+    lastResults=null;
+  }
+
+  function initSingleMode(){
+    const c=document.getElementById('coursesContainer');
+    c.querySelectorAll('.course-card').forEach(x=>x.remove());
+    addCourseCard({code:'',name:'My Course'},{removable:false});
+    const card=c.querySelector('.course-card');
+    if(card) card.classList.add('single-mode');
+    checkEmpty(); hideResults();
+  }
+
+  function initDirectMode(){
+    const c=document.getElementById('coursesContainer');
+    c.querySelectorAll('.course-card').forEach(x=>x.remove());
+    addCourseCard({code:'',name:'My Course'},{removable:false,templateId:'directCardTemplate'});
+    const card=c.querySelector('.course-card');
+    if(card) card.classList.add('single-mode');
+    checkEmpty(); hideResults();
+  }
+
+  function getCurrentMode(){
+    if(document.getElementById('modeSingle').checked) return 'single';
+    if(document.getElementById('modeMultiple').checked) return 'multiple';
+    return 'direct';
+  }
+
+  const MODE_DESC={
+    single:'Enter your Class Test scores, Mid-term, Assignments, and Attendance below. The calculator uses your best 2 out of 3 CT scores.',
+    multiple:'Choose a semester to load all its courses at once. You can edit any course name. Marks are entered per course.',
+    direct:'Already know your total in-course mark? Enter it directly (out of 50) to instantly see what you need in the final exam.'
+  };
+
+  function onModeChange(){
+    const mode=getCurrentMode();
+    document.getElementById('multiPicker').hidden=(mode!=='multiple');
+    document.getElementById('semesterSelect').value='';
+    document.getElementById('coursesContainer').querySelectorAll('.course-card').forEach(x=>x.remove());
+    if(mode==='single') initSingleMode();
+    else if(mode==='direct') initDirectMode();
+    else { document.getElementById('emptyHint').hidden=false; }
+    hideResults();
+    document.getElementById('modeDescText').textContent=MODE_DESC[mode];
+  }
+
+  // ── Calculation ──
+  let lastResults=null;
+
+  function readCard(card){
+    const n=(sel,def)=>{ const v=parseFloat(card.querySelector(sel)?.value); return isNaN(v)?def:v; };
+    return {
+      ct1:n('.ct1-score',0), ct1Max:n('.ct1-max',10),
+      ct2:n('.ct2-score',0), ct2Max:n('.ct2-max',10),
+      ct3:n('.ct3-score',0), ct3Max:n('.ct3-max',10),
+      midTerm:n('.midTerm',0),
+      assignments:n('.assignments',0),
+      attendance:n('.attendance',0),
+      desiredGpa:n('.desiredGpa',NaN)
+    };
+  }
+
+  function readDirectCard(card){
+    const n=(sel,def)=>{ const v=parseFloat(card.querySelector(sel)?.value); return isNaN(v)?def:v; };
+    return { inCourseDirect:n('.inCourseDirect',0), desiredGpa:n('.desiredGpa',NaN) };
+  }
+
+  function validateCard(d){
+    if(d.ct1Max<=0||d.ct2Max<=0||d.ct3Max<=0) return '"Out of" values must be greater than 0.';
+    if(d.ct1<0||d.ct1>d.ct1Max||d.ct2<0||d.ct2>d.ct2Max||d.ct3<0||d.ct3>d.ct3Max)
+      return 'Each CT score must be between 0 and its "out of" value.';
+    if(d.midTerm<0||d.midTerm>20) return 'Mid-term must be 0 – 20.';
+    if(d.assignments<0||d.assignments>10) return 'Assignments must be 0 – 10.';
+    if(d.attendance<0||d.attendance>10) return 'Attendance must be 0 – 10.';
+    if(isNaN(d.desiredGpa)) return 'Please select a target GPA.';
+    return null;
+  }
+
+  function validateDirectCard(d){
+    if(d.inCourseDirect<0||d.inCourseDirect>50) return 'In-course mark must be 0 – 50.';
+    if(isNaN(d.desiredGpa)) return 'Please select a target GPA.';
+    return null;
+  }
+
+  function computeFromInCourse(inCourse, desiredGpa){
+    const target=getMinPct(desiredGpa);
+    const req=(target-inCourse)/0.50;
+    const status=req>100?'impossible':req<=0?'achieved':'normal';
+    return {inCourse, requiredFinal:req, desiredGpa, status};
+  }
+
+  function computeCard(d){
+    const c1=(d.ct1/d.ct1Max)*5, c2=(d.ct2/d.ct2Max)*5, c3=(d.ct3/d.ct3Max)*5;
+    const best2=[c1,c2,c3].sort((a,b)=>b-a);
+    const ct=best2[0]+best2[1];
+    return computeFromInCourse(ct+d.midTerm+d.assignments+d.attendance, d.desiredGpa);
+  }
+
+  function msgFor(r){
+    const f50=(r.requiredFinal*0.50).toFixed(1);
+    if(r.status==='achieved') return `🎉 Already secured! Your in-course score of <span class="chip">${r.inCourse.toFixed(2)}/50</span> guarantees the target grade — no minimum needed from the final.`;
+    if(r.status==='impossible') return `⚠️ Not reachable. Reaching this GPA would require more than 100 marks in the final exam with your current in-course score of <span class="chip">${r.inCourse.toFixed(2)}/50</span>. Consider a lower target.`;
+    return `Score at least <span class="chip">${r.requiredFinal.toFixed(1)}/100</span> <em>(equiv. ${f50}/50)</em> in the final exam. Your in-course so far: <span class="chip">${r.inCourse.toFixed(2)}/50</span>.`;
+  }
+
+  function mainScoreDisplay(r){
+    if(r.status==='achieved') return {num:'✓',label:'Already Secured'};
+    if(r.status==='impossible') return {num:'✗',label:'Not Reachable'};
+    const f50=(r.requiredFinal*0.50).toFixed(1);
+    return {num:r.requiredFinal.toFixed(1),label:`need /100 · ${f50}/50`};
+  }
+
+  function renderResults(results){
+    const sec=document.getElementById('resultsSection');
+    sec.innerHTML='';
+
+    if(results.length>1){
+      const ach=results.filter(r=>r.status==='achieved').length;
+      const bar=document.createElement('div');
+      bar.className='results-summary-bar';
+      bar.innerHTML=`<svg viewBox="0 0 20 20" fill="currentColor"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/><path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm9.707 5.707a1 1 0 00-1.414-1.414L9 12.586l-1.293-1.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+        ${ach} of ${results.length} courses already at target`;
+      sec.appendChild(bar);
+    }
+
+    results.forEach(r=>{
+      const sc=mainScoreDisplay(r);
+      const div=document.createElement('div');
+      div.className=`result-card status-${r.status}`;
+      div.innerHTML=`
+        <div class="result-card-head">
+          <div class="result-card-head-left">
+            <span class="result-course-name">${esc(r.label)}</span>
+            ${r.code?`<span class="result-code">${esc(r.code)}</span>`:''}
+          </div>
+          <span class="result-badge">Target GPA ${r.desiredGpa.toFixed(2)}</span>
+        </div>
+        <div class="result-card-body">
+          <div class="result-big">
+            <div class="result-score-box">
+              <div class="result-score-num">${esc(sc.num)}</div>
+              <div class="result-score-label">${esc(sc.label)}</div>
+            </div>
+            <div class="result-msg">${msgFor(r)}</div>
+          </div>
+          ${buildGradeRangeTable(r.inCourse, r.desiredGpa)}
+        </div>`;
+      // toggle for grade table
+      div.querySelectorAll('.grade-range-toggle').forEach(t=>{
+        t.addEventListener('click',()=>t.closest('.grade-range-wrap').classList.toggle('open'));
+      });
+      sec.appendChild(div);
+    });
+
+    // auto-scroll to results
+    sec.scrollIntoView({behavior:'smooth', block:'nearest'});
+  }
+
+  function handleCalculate(){
+    const cards=Array.from(document.querySelectorAll('#coursesContainer .course-card'));
+    const sec=document.getElementById('resultsSection');
+    const dlBtn=document.getElementById('downloadBtn');
+
+    if(!cards.length){
+      sec.innerHTML=`<div class="error-box"><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>Add at least one course before calculating.</div>`;
+      sec.hidden=false; dlBtn.hidden=true; lastResults=null; return;
+    }
+
+    const errors=[], results=[];
+    cards.forEach(card=>{
+      const label=card.querySelector('.course-name')?.value.trim()||'Untitled Course';
+      const code=card.dataset.code||'';
+      const isDirect=card.classList.contains('direct-card');
+      if(isDirect){
+        const d=readDirectCard(card);
+        const e=validateDirectCard(d);
+        if(e) errors.push(`${label}: ${e}`);
+        else results.push({label, code, ...computeFromInCourse(d.inCourseDirect, d.desiredGpa)});
+      } else {
+        const d=readCard(card);
+        const e=validateCard(d);
+        if(e) errors.push(`${label}: ${e}`);
+        else results.push({label, code, ...computeCard(d)});
+      }
+    });
+
+    if(errors.length){
+      sec.innerHTML=errors.map(e=>`<div class="error-box"><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>${esc(e)}</div>`).join('');
+      sec.hidden=false; dlBtn.hidden=true; lastResults=null; return;
+    }
+
+    lastResults=results;
+    renderResults(results);
+    sec.hidden=false; dlBtn.hidden=false;
+  }
+
+  // ── Download ──
+  function showDownloadPopup(){ document.getElementById('downloadPopup').classList.add('active'); }
+  function hideDownloadPopup(){ document.getElementById('downloadPopup').classList.remove('active'); }
+
+  function roundRect(ctx,x,y,w,h,r){
+    ctx.beginPath();
+    ctx.moveTo(x+r,y);
+    ctx.arcTo(x+w,y,x+w,y+h,r);
+    ctx.arcTo(x+w,y+h,x,y+h,r);
+    ctx.arcTo(x,y+h,x,y,r);
+    ctx.arcTo(x,y,x+w,y,r);
+    ctx.closePath();
+  }
+
+  function wrapText(ctx,text,x,y,maxW,lh){
+    const words=text.split(' '); let line='', curY=y;
+    for(let i=0;i<words.length;i++){
+      const t=line+words[i]+' ';
+      if(ctx.measureText(t).width>maxW&&i>0){ ctx.fillText(line,x,curY); line=words[i]+' '; curY+=lh; }
+      else line=t;
+    }
+    ctx.fillText(line,x,curY);
+    return curY+lh;
+  }
+
+  function downloadResultsImage(){
+    if(!lastResults||!lastResults.length){ alert('Calculate first.'); hideDownloadPopup(); return; }
+    const W=800, hdr=120, cardH=130, gap=16, ftr=50;
+    const H=hdr+lastResults.length*(cardH+gap)+ftr+20;
+    const cv=document.createElement('canvas');
+    cv.width=W; cv.height=H;
+    const ctx=cv.getContext('2d');
+
+    ctx.fillStyle='#f0f2f8'; ctx.fillRect(0,0,W,H);
+
+    const gr=ctx.createLinearGradient(0,0,W,0);
+    gr.addColorStop(0,'#4f46e5'); gr.addColorStop(1,'#3730a3');
+    ctx.fillStyle=gr; ctx.fillRect(0,0,W,hdr);
+
+    ctx.fillStyle='#fff'; ctx.textAlign='center';
+    ctx.font='bold 26px Arial'; ctx.fillText('BUP CGPA Calculator',W/2,46);
+    ctx.font='14px Arial'; ctx.fillText('Required Final Exam Marks · '+new Date().toLocaleDateString(),W/2,72);
+    ctx.font='12px Arial'; ctx.fillStyle='rgba(255,255,255,.7)';
+    ctx.fillText('Assessment: 50% In-Course + 50% Final Exam | Best 2 of 3 Class Tests',W/2,96);
+
+    ctx.textAlign='left';
+    let y=hdr+20;
+    lastResults.forEach(r=>{
+      const top=y;
+      ctx.fillStyle=r.status==='achieved'?'#ecfdf5':r.status==='impossible'?'#fef2f2':'#fff';
+      ctx.strokeStyle=r.status==='achieved'?'#a7f3d0':r.status==='impossible'?'#fecaca':'#e5e7eb';
+      ctx.lineWidth=1.5;
+      roundRect(ctx,30,top,W-60,cardH,12); ctx.fill(); ctx.stroke();
+
+      const stripW=6;
+      ctx.fillStyle=r.status==='achieved'?'#059669':r.status==='impossible'?'#dc2626':'#4f46e5';
+      ctx.beginPath(); ctx.roundRect(30,top,stripW,cardH,{upperLeft:12,lowerLeft:12}); ctx.fill();
+
+      ctx.fillStyle='#111827'; ctx.font='bold 17px Arial';
+      ctx.fillText(r.label,54,top+28);
+
+      ctx.font='12px Arial'; ctx.fillStyle='#6b7280';
+      ctx.fillText(`Target GPA: ${r.desiredGpa.toFixed(2)} · In-course: ${r.inCourse.toFixed(2)}/50`,54,top+50);
+
+      const sc=mainScoreDisplay(r);
+      ctx.font='bold 22px Arial';
+      ctx.fillStyle=r.status==='achieved'?'#059669':r.status==='impossible'?'#dc2626':'#4f46e5';
+      ctx.fillText(sc.num,54,top+82);
+
+      ctx.font='13px Arial';
+      ctx.fillStyle=r.status==='achieved'?'#059669':r.status==='impossible'?'#dc2626':'#374151';
+      // Strip HTML tags from message for canvas
+      const plainMsg=msgFor(r).replace(/<[^>]+>/g,'');
+      wrapText(ctx,plainMsg,54,top+105,W-120,16);
+
+      y+=cardH+gap;
+    });
+
+    ctx.fillStyle='#9ca3af'; ctx.font='11px Arial'; ctx.textAlign='center';
+    ctx.fillText('Generated by BUP CGPA Calculator · muztabarafid.github.io',W/2,H-18);
+
+    const a=document.createElement('a');
+    a.download='BUP_CGPA_Results.png';
+    a.href=cv.toDataURL('image/png');
+    a.click();
+    hideDownloadPopup();
+  }
+
+  // ── Toast Notification ──
+  function showToast(msg, type='info', duration=4000){
+    const t=document.getElementById('toastNotification');
+    if(!t) return;
+    t.textContent=msg;
+    t.className=`toast-notification show ${type}`;
+    clearTimeout(t._timer);
+    t._timer=setTimeout(()=>{
+      t.className='toast-notification';
+    }, duration);
+  }
+
+  // ── Auth Modal Controls ──
+  function openAuthModal(mode='signIn'){
+    switchAuthTab(mode);
+    clearAuthError();
+    document.getElementById('authModal').classList.add('active');
+  }
+
+  function closeAuthModal(){
+    document.getElementById('authModal').classList.remove('active');
+    clearAuthError();
+  }
+
+  function clearAuthError(){
+    const errBox=document.getElementById('authError');
+    if(!errBox) return;
+    errBox.textContent='';
+    errBox.style.display='none';
+  }
+
+  function showAuthError(msg){
+    const errBox=document.getElementById('authError');
+    if(!errBox) return;
+    errBox.textContent=msg;
+    errBox.style.display='block';
+  }
+
+  function friendlyAuthError(err){
+    const code = err.code || '';
+    if(code === 'auth/invalid-credential' || code === 'auth/wrong-password' || code === 'auth/user-not-found') {
+      return 'Invalid email or password. Please verify and try again.';
+    }
+    if(code === 'auth/email-already-in-use') {
+      return 'An account with this email already exists. Click "Sign In" above.';
+    }
+    if(code === 'auth/weak-password') {
+      return 'Password should be at least 6 characters.';
+    }
+    if(code === 'auth/invalid-email') {
+      return 'Please enter a valid email address.';
+    }
+    if(code === 'auth/popup-closed-by-user') {
+      return 'Sign-in popup was closed. Please try again.';
+    }
+    if(code === 'auth/popup-blocked') {
+      return 'Popup was blocked by your browser. Please allow popups for this site.';
+    }
+    if(code === 'auth/network-request-failed') {
+      return 'Network connection error. Please check your internet connection.';
+    }
+    return err.message || 'Authentication error. Please try again.';
+  }
+
+  function switchAuthTab(mode){
+    authMode = mode;
+    const tabIn = document.getElementById('tabSignIn');
+    const tabUp = document.getElementById('tabSignUp');
+    const nameField = document.getElementById('nameField');
+    const submitBtn = document.getElementById('authSubmitBtn');
+    const forgotBtn = document.getElementById('forgotPasswordBtn');
+    clearAuthError();
+
+    if(mode === 'signUp'){
+      tabIn.classList.remove('active');
+      tabUp.classList.add('active');
+      nameField.style.display = 'block';
+      submitBtn.textContent = 'Create Account';
+      forgotBtn.style.display = 'none';
+    } else {
+      tabIn.classList.add('active');
+      tabUp.classList.remove('active');
+      nameField.style.display = 'none';
+      submitBtn.textContent = 'Sign In';
+      forgotBtn.style.display = 'inline-block';
+    }
+  }
+
+  // ── Auth Actions ──
+  async function handleGoogleSignIn(){
+    const btn = document.getElementById('googleSignInBtn');
+    btn.disabled = true;
+    clearAuthError();
+    try {
+      const provider = new GoogleAuthProvider();
+      provider.setCustomParameters({ prompt: 'select_account' });
+      await signInWithPopup(auth, provider);
+      closeAuthModal();
+      showToast('Signed in successfully with Google!', 'success');
+    } catch(err) {
+      if(err.code !== 'auth/popup-closed-by-user'){
+        showAuthError(friendlyAuthError(err));
+      }
+    } finally {
+      btn.disabled = false;
+    }
+  }
+
+  async function handleAuthSubmit(e){
+    e.preventDefault();
+    const email = document.getElementById('authEmail').value.trim();
+    const password = document.getElementById('authPassword').value;
+    const name = document.getElementById('authName').value.trim();
+    const submitBtn = document.getElementById('authSubmitBtn');
+
+    if(!email || !password){
+      showAuthError('Please enter both email and password.');
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Please wait...';
+    clearAuthError();
+
+    try {
+      if(authMode === 'signUp'){
+        const cred = await createUserWithEmailAndPassword(auth, email, password);
+        if(name && cred.user){
+          await updateProfile(cred.user, { displayName: name });
+        }
+        closeAuthModal();
+        showToast('🎉 Account created! Welcome, ' + (name || email.split('@')[0]) + '!', 'success');
+      } else {
+        await signInWithEmailAndPassword(auth, email, password);
+        closeAuthModal();
+        showToast('Signed in successfully!', 'success');
+      }
+    } catch(err) {
+      showAuthError(friendlyAuthError(err));
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = (authMode === 'signUp') ? 'Create Account' : 'Sign In';
+    }
+  }
+
+  async function handleForgotPassword(){
+    const email = document.getElementById('authEmail').value.trim();
+    if(!email){
+      showAuthError('Please enter your email address first to reset your password.');
+      document.getElementById('authEmail').focus();
+      return;
+    }
+    try {
+      await sendPasswordResetEmail(auth, email);
+      showToast('✉️ Password reset email sent! Check your inbox.', 'info');
+    } catch(err) {
+      showAuthError(friendlyAuthError(err));
+    }
+  }
+
+  async function handleSignOut(){
+    try {
+      await signOut(auth);
+      showToast('Signed out of cloud account.', 'info');
+    } catch(err) {
+      showToast('Failed to sign out: ' + err.message, 'error');
+    }
+  }
+
+  // ── Firestore Save & Load ──
+  function collectCurrentMarks(){
+    const mode = getCurrentMode();
+    const c = document.getElementById('coursesContainer');
+    const cards = Array.from(c.querySelectorAll('.course-card'));
+
+    const payload = {
+      mode,
+      savedAt: new Date().toISOString()
     };
 
-    const YEAR_LABELS = { 1:'1st Year', 2:'2nd Year', 3:'3rd Year', 4:'4th Year' };
-    const SEM_LABELS = { 1:'1st Semester', 2:'2nd Semester' };
-
-    const gradingScale = [
-      { grade:'A+', gpa:4.00, minPercent:80, maxPercent:100 },
-      { grade:'A',  gpa:3.75, minPercent:75, maxPercent:79  },
-      { grade:'A-', gpa:3.50, minPercent:70, maxPercent:74  },
-      { grade:'B+', gpa:3.25, minPercent:65, maxPercent:69  },
-      { grade:'B',  gpa:3.00, minPercent:60, maxPercent:64  },
-      { grade:'B-', gpa:2.75, minPercent:55, maxPercent:59  },
-      { grade:'C+', gpa:2.50, minPercent:50, maxPercent:54  },
-      { grade:'C',  gpa:2.25, minPercent:45, maxPercent:49  },
-      { grade:'D',  gpa:2.00, minPercent:40, maxPercent:44  },
-      { grade:'F',  gpa:0.00, minPercent:0,  maxPercent:39  }
-    ];
-
-    function getMinPercentageForGPA(gpa){
-      const entry = gradingScale.find(g => g.gpa === gpa);
-      return entry ? entry.minPercent : null;
-    }
-
-    function buildGradeRangeTable(inCourse, desiredGpa){
-      const rows = gradingScale
-        .filter(function(g){ return g.gpa >= 2.00; })
-        .map(function(g){
-          const rawMin = (g.minPercent - inCourse) / 0.40;
-          const rawMax = (g.maxPercent + 0.999 - inCourse) / 0.40;
-          let classes = [];
-          let display;
-          if (rawMax < 0){
-            classes.push('achieved');
-            display = 'Already secured';
-          } else if (rawMin > 100){
-            classes.push('impossible');
-            display = 'Not reachable';
-          } else {
-            const dMin = Math.max(0, rawMin);
-            const dMax = Math.min(100, rawMax);
-            const prefix = rawMin <= 0 ? '≤ ' : '';
-            const suffix = rawMax > 100 ? '+' : '';
-            display = prefix + dMin.toFixed(2) + ' – ' + dMax.toFixed(2) + suffix;
-          }
-          if (Math.abs(g.gpa - desiredGpa) < 0.001) classes.push('highlight');
-          return '<tr class="' + classes.join(' ') + '"><td>' + g.grade + '</td><td>' + g.gpa.toFixed(2) + '</td><td>' + display + '</td></tr>';
-        }).join('');
-      return '<div class="grade-range-wrap">' +
-        '<div class="grange-title">Final exam marks needed for each grade</div>' +
-        '<table class="grade-range-table">' +
-        '<thead><tr><th>Grade</th><th>GPA</th><th>Final Marks Needed (/100)</th></tr></thead>' +
-        '<tbody>' + rows + '</tbody>' +
-        '</table></div>';
-    }
-
-
-    let lastResults = null;
-
-    function escapeHtml(str){
-      const div = document.createElement('div');
-      div.textContent = str;
-      return div.innerHTML;
-    }
-
-    // ---------- Semester / course pickers ----------
-    function populateSemesterSelect(){
-      const sel = document.getElementById('semesterSelect');
-      const opts = ['<option value="">Select semester</option>'];
-      for (let y = 1; y <= 4; y++){
-        for (let s = 1; s <= 2; s++){
-          opts.push(`<option value="${y}-${s}">${YEAR_LABELS[y]} — ${SEM_LABELS[s]}</option>`);
-        }
+    if(mode === 'single'){
+      const card = cards[0];
+      if(card){
+        const name = card.querySelector('.course-name')?.value || '';
+        const r = readCard(card);
+        payload.singleData = { name, ...r };
       }
-      sel.innerHTML = opts.join('');
+    } else if(mode === 'multiple'){
+      const sem = document.getElementById('semesterSelect').value;
+      payload.multipleData = {
+        semester: sem,
+        courses: cards.map(card => {
+          const code = card.dataset.code || card.querySelector('.course-code')?.textContent.trim() || '';
+          const name = card.querySelector('.course-name')?.value || '';
+          const r = readCard(card);
+          return { code, name, ...r };
+        })
+      };
+    } else if(mode === 'direct'){
+      const card = cards[0];
+      if(card){
+        const name = card.querySelector('.course-name')?.value || '';
+        const r = readDirectCard(card);
+        payload.directData = { name, ...r };
+      }
     }
 
-    function loadCoursesForSemester(){
-      const semVal = document.getElementById('semesterSelect').value;
-      const container = document.getElementById('coursesContainer');
-      container.querySelectorAll('.course-card').forEach(c => c.remove());
-      hideResults();
+    return payload;
+  }
 
-      if (!semVal){
-        checkEmptyState();
+  async function saveStudentMarks(){
+    if(!currentUser){
+      openAuthModal('signIn');
+      showToast('Please sign in first to save your marks to your account.', 'warn');
+      return;
+    }
+
+    const saveBtn = document.getElementById('saveMarksBtn');
+    const saveBtnText = document.getElementById('saveBtnText');
+    saveBtn.disabled = true;
+    saveBtnText.textContent = 'Saving...';
+
+    try {
+      const data = collectCurrentMarks();
+      data.userId = currentUser.uid;
+      data.userEmail = currentUser.email || '';
+      data.userDisplayName = currentUser.displayName || '';
+
+      const studentDocRef = doc(db, 'students', currentUser.uid);
+      await setDoc(studentDocRef, data, { merge: true });
+
+      const statusEl = document.getElementById('userCloudStatus');
+      if(statusEl) statusEl.textContent = '● Cloud Synced (Just now)';
+      showToast('✅ Marks saved successfully! You can log in anytime to update.', 'success');
+    } catch(err) {
+      console.error('Firestore save error:', err);
+      showToast('❌ Save error: ' + (err.message || 'Check database permissions in Firebase Console'), 'error', 5000);
+    } finally {
+      saveBtn.disabled = false;
+      saveBtnText.textContent = 'Save to Cloud';
+    }
+  }
+
+  async function loadStudentMarks(user){
+    if(!user) return;
+    const statusEl = document.getElementById('userCloudStatus');
+    try {
+      const studentDocRef = doc(db, 'students', user.uid);
+      const snap = await getDoc(studentDocRef);
+      if(!snap.exists()){
+        if(statusEl) statusEl.textContent = '● Cloud Connected (No marks saved yet)';
         return;
       }
-      const [y, s] = semVal.split('-');
-      const list = COURSES[y][s];
-      list.forEach(course => addCourseCard(course, { removable:false }));
-      checkEmptyState();
-    }
 
-    // ---------- Course cards ----------
-    function addCourseCard(courseObj, opts = {}){
-      const { removable = true, templateId = 'courseCardTemplate' } = opts;
-      const tpl = document.getElementById(templateId);
-      const frag = tpl.content.cloneNode(true);
-      const card = frag.querySelector('.course-card');
-      card.dataset.code = courseObj.code;
-      const codeEl = card.querySelector('.course-code');
-      const nameInput = card.querySelector('.course-name');
-      if (courseObj.code && courseObj.code !== 'Custom'){
-        codeEl.textContent = courseObj.code;
-      } else {
-        codeEl.remove();
-      }
-      nameInput.value = courseObj.name;
+      const data = snap.data();
+      if(!data) return;
 
-      const removeBtn = card.querySelector('.remove-btn');
-      if (removable){
-        removeBtn.addEventListener('click', () => {
-          card.remove();
-          checkEmptyState();
-          hideResults();
-        });
-      } else {
-        removeBtn.remove();
-      }
+      if(data.mode === 'multiple' && data.multipleData){
+        document.getElementById('modeMultiple').checked = true;
+        document.getElementById('multiPicker').hidden = false;
+        document.getElementById('modeDescText').textContent = MODE_DESC['multiple'];
 
-      document.getElementById('coursesContainer').appendChild(frag);
-      checkEmptyState();
-    }
-
-    function checkEmptyState(){
-      const hasCards = document.querySelectorAll('#coursesContainer .course-card').length > 0;
-      document.getElementById('emptyHint').hidden = hasCards;
-    }
-
-    function hideResults(){
-      document.getElementById('resultsSection').hidden = true;
-      document.getElementById('downloadBtn').hidden = true;
-      lastResults = null;
-    }
-
-    function initSingleMode(){
-      const container = document.getElementById('coursesContainer');
-      container.querySelectorAll('.course-card').forEach(c => c.remove());
-      addCourseCard({ code:'', name:'My Course' }, { removable:false });
-      const card = container.querySelector('.course-card');
-      if (card) card.classList.add('single-mode');
-      checkEmptyState();
-      hideResults();
-    }
-
-    function initDirectMode(){
-      const container = document.getElementById('coursesContainer');
-      container.querySelectorAll('.course-card').forEach(c => c.remove());
-      addCourseCard({ code:'', name:'My Course' }, { removable:false, templateId:'directCardTemplate' });
-      const card = container.querySelector('.course-card');
-      if (card) card.classList.add('single-mode');
-      checkEmptyState();
-      hideResults();
-    }
-
-    function getCurrentMode(){
-      if (document.getElementById('modeSingle').checked) return 'single';
-      if (document.getElementById('modeMultiple').checked) return 'multiple';
-      return 'direct';
-    }
-
-    function onModeChange(){
-      const mode = getCurrentMode();
-      document.getElementById('multiPicker').hidden = (mode !== 'multiple');
-      document.getElementById('semesterSelect').value = '';
-
-      const container = document.getElementById('coursesContainer');
-      container.querySelectorAll('.course-card').forEach(c => c.remove());
-
-      if (mode === 'single'){
-        initSingleMode();
-      } else if (mode === 'direct'){
+        const sem = data.multipleData.semester || '';
+        document.getElementById('semesterSelect').value = sem;
+        if(sem){
+          loadCoursesForSemester();
+          const cards = document.querySelectorAll('#coursesContainer .course-card');
+          const savedCourses = data.multipleData.courses || [];
+          cards.forEach((card, idx) => {
+            const code = card.dataset.code || card.querySelector('.course-code')?.textContent.trim() || '';
+            const saved = savedCourses.find(s => s.code === code) || savedCourses[idx];
+            if(saved){
+              if(saved.name && card.querySelector('.course-name')) card.querySelector('.course-name').value = saved.name;
+              const setVal = (sel, val) => {
+                const el = card.querySelector(sel);
+                if(el && val !== undefined && val !== null && !isNaN(val)) el.value = val;
+              };
+              setVal('.ct1-score', saved.ct1);
+              setVal('.ct1-max', saved.ct1Max);
+              setVal('.ct2-score', saved.ct2);
+              setVal('.ct2-max', saved.ct2Max);
+              setVal('.ct3-score', saved.ct3);
+              setVal('.ct3-max', saved.ct3Max);
+              setVal('.midTerm', saved.midTerm);
+              setVal('.assignments', saved.assignments);
+              setVal('.attendance', saved.attendance);
+              setVal('.desiredGpa', saved.desiredGpa);
+              updateLiveBar(card);
+            }
+          });
+        }
+      } else if(data.mode === 'direct' && data.directData){
+        document.getElementById('modeDirect').checked = true;
+        document.getElementById('multiPicker').hidden = true;
+        document.getElementById('modeDescText').textContent = MODE_DESC['direct'];
         initDirectMode();
+        const card = document.querySelector('#coursesContainer .course-card');
+        if(card){
+          if(data.directData.name && card.querySelector('.course-name')) card.querySelector('.course-name').value = data.directData.name;
+          if(card.querySelector('.inCourseDirect') && !isNaN(data.directData.inCourseDirect)) card.querySelector('.inCourseDirect').value = data.directData.inCourseDirect;
+          if(card.querySelector('.desiredGpa') && !isNaN(data.directData.desiredGpa)) card.querySelector('.desiredGpa').value = data.directData.desiredGpa;
+          updateLiveBar(card);
+        }
+      } else if(data.singleData){
+        document.getElementById('modeSingle').checked = true;
+        document.getElementById('multiPicker').hidden = true;
+        document.getElementById('modeDescText').textContent = MODE_DESC['single'];
+        initSingleMode();
+        const card = document.querySelector('#coursesContainer .course-card');
+        if(card){
+          const saved = data.singleData;
+          if(saved.name && card.querySelector('.course-name')) card.querySelector('.course-name').value = saved.name;
+          const setVal = (sel, val) => {
+            const el = card.querySelector(sel);
+            if(el && val !== undefined && val !== null && !isNaN(val)) el.value = val;
+          };
+          setVal('.ct1-score', saved.ct1);
+          setVal('.ct1-max', saved.ct1Max);
+          setVal('.ct2-score', saved.ct2);
+          setVal('.ct2-max', saved.ct2Max);
+          setVal('.ct3-score', saved.ct3);
+          setVal('.ct3-max', saved.ct3Max);
+          setVal('.midTerm', saved.midTerm);
+          setVal('.assignments', saved.assignments);
+          setVal('.attendance', saved.attendance);
+          setVal('.desiredGpa', saved.desiredGpa);
+          updateLiveBar(card);
+        }
+      }
+
+      if(statusEl) statusEl.textContent = '● Cloud Synced (Loaded)';
+      showToast('📂 Saved marks loaded from cloud!', 'info');
+    } catch(err) {
+      console.error('Firestore load error:', err);
+      if(statusEl) statusEl.textContent = '● Cloud Sync Error';
+    }
+  }
+
+  // ── Auth State Listener ──
+  onAuthStateChanged(auth, user => {
+    currentUser = user;
+    const authGuest = document.getElementById('authGuest');
+    const authUser = document.getElementById('authUser');
+    const userDisplayName = document.getElementById('userDisplayName');
+    const userPhoto = document.getElementById('userPhoto');
+    const userPhotoFallback = document.getElementById('userPhotoFallback');
+    const userCloudStatus = document.getElementById('userCloudStatus');
+
+    if(user){
+      if(authGuest) authGuest.hidden = true;
+      if(authUser) authUser.hidden = false;
+      const dName = user.displayName || (user.email ? user.email.split('@')[0] : 'Student');
+      if(userDisplayName) userDisplayName.textContent = dName;
+      if(user.photoURL){
+        if(userPhoto){
+          userPhoto.src = user.photoURL;
+          userPhoto.style.display = 'block';
+        }
+        if(userPhotoFallback) userPhotoFallback.style.display = 'none';
       } else {
-        document.getElementById('emptyHint').textContent = 'Select a semester above to load its courses.';
-        checkEmptyState();
-      }
-
-      hideResults();
-      updateModeHint();
-    }
-
-    function updateModeHint(){
-      const mode = getCurrentMode();
-      const hints = {
-        single: 'Enter your marks for the course below.',
-        multiple: 'Pick a semester to load all its courses, then enter marks for each. Edit any course name if needed.',
-        direct: 'Already know your total in-course mark? Enter it directly (out of 60) to see what you need in the final.'
-      };
-      document.getElementById('modeHint').textContent = hints[mode];
-    }
-
-    // ---------- Calculation ----------
-    function readCourseCard(card){
-      // Use Number.isNaN (not `|| default`) so an explicit 0 is never
-      // silently replaced by the default — that would hide invalid input
-      // (like a 0 "out of" value) from validation below.
-      const num = (sel, def) => {
-        const v = parseFloat(card.querySelector(sel).value);
-        return Number.isNaN(v) ? def : v;
-      };
-      return {
-        ct1: num('.ct1-score', 0), ct1Max: num('.ct1-max', 10),
-        ct2: num('.ct2-score', 0), ct2Max: num('.ct2-max', 10),
-        ct3: num('.ct3-score', 0), ct3Max: num('.ct3-max', 10),
-        ct4: num('.ct4-score', 0), ct4Max: num('.ct4-max', 10),
-        midTerm: num('.midTerm', 0),
-        assignments: num('.assignments', 0),
-        project: num('.project', 0),
-        attendance: num('.attendance', 0),
-        desiredGpa: num('.desiredGpa', NaN)
-      };
-    }
-
-    function readDirectCard(card){
-      const num = (sel, def) => {
-        const v = parseFloat(card.querySelector(sel).value);
-        return Number.isNaN(v) ? def : v;
-      };
-      return {
-        inCourseDirect: num('.inCourseDirect', 0),
-        desiredGpa: num('.desiredGpa', NaN)
-      };
-    }
-
-    function validateCourseInputs(d){
-      if (d.ct1Max <= 0 || d.ct2Max <= 0 || d.ct3Max <= 0 || d.ct4Max <= 0){
-        return 'Class Test "out of" values must be greater than 0.';
-      }
-      if (d.ct1 < 0 || d.ct1 > d.ct1Max || d.ct2 < 0 || d.ct2 > d.ct2Max ||
-          d.ct3 < 0 || d.ct3 > d.ct3Max || d.ct4 < 0 || d.ct4 > d.ct4Max){
-        return 'Each Class Test score must be between 0 and its "out of" value.';
-      }
-      if (d.midTerm < 0 || d.midTerm > 20) return 'Mid Term must be between 0 and 20.';
-      if (d.assignments < 0 || d.assignments > 10) return 'Assignments must be between 0 and 10.';
-      if (d.project < 0 || d.project > 10) return 'Project must be between 0 and 10.';
-      if (d.attendance < 0 || d.attendance > 10) return 'Attendance must be between 0 and 10.';
-      if (isNaN(d.desiredGpa)) return 'Please select a desired GPA.';
-      return null;
-    }
-
-    function validateDirectInputs(d){
-      if (d.inCourseDirect < 0 || d.inCourseDirect > 60) return 'In-course mark must be between 0 and 60.';
-      if (isNaN(d.desiredGpa)) return 'Please select a desired GPA.';
-      return null;
-    }
-
-    function computeFromInCourse(inCourse, desiredGpa){
-      const targetPercent = getMinPercentageForGPA(desiredGpa);
-      const requiredFinal = (targetPercent - inCourse) / 0.40;
-
-      let status;
-      if (requiredFinal > 100) status = 'impossible';
-      else if (requiredFinal <= 0) status = 'achieved';
-      else status = 'normal';
-
-      return { inCourse, requiredFinal, desiredGpa, status };
-    }
-
-    function computeResult(d){
-      const c1 = (d.ct1 / d.ct1Max) * 2.5;
-      const c2 = (d.ct2 / d.ct2Max) * 2.5;
-      const c3 = (d.ct3 / d.ct3Max) * 2.5;
-      const c4 = (d.ct4 / d.ct4Max) * 2.5;
-      const inCourse = c1 + c2 + c3 + c4 + d.midTerm + d.assignments + d.project + d.attendance;
-      return computeFromInCourse(inCourse, d.desiredGpa);
-    }
-
-    function computeDirectResult(d){
-      return computeFromInCourse(d.inCourseDirect, d.desiredGpa);
-    }
-
-    function messageFor(r){
-      if (r.status === 'achieved'){
-        return `Already secured — in-course score ${r.inCourse.toFixed(2)}/60.`;
-      }
-      if (r.status === 'impossible'){
-        return `Not reachable from here — would need ${r.requiredFinal.toFixed(2)}/100 in the final exam (in-course ${r.inCourse.toFixed(2)}/60). Consider a lower target.`;
-      }
-      return `Score at least ${r.requiredFinal.toFixed(2)}/100 in the final exam (in-course ${r.inCourse.toFixed(2)}/60).`;
-    }
-
-    function renderResults(results){
-      const section = document.getElementById('resultsSection');
-      section.innerHTML = '';
-
-      if (results.length > 1){
-        const achieved = results.filter(r => r.status === 'achieved').length;
-        const summary = document.createElement('p');
-        summary.className = 'results-summary';
-        summary.textContent = `${achieved} of ${results.length} courses already at target.`;
-        section.appendChild(summary);
-      }
-
-      results.forEach(r => {
-        const row = document.createElement('div');
-        row.className = `result-row status-${r.status}`;
-        row.innerHTML = `
-          <div class="result-row-head">
-            <strong>${escapeHtml(r.label)}</strong>
-            <span class="badge">Target ${r.desiredGpa.toFixed(2)}</span>
-          </div>
-          <div class="result-row-body">${escapeHtml(messageFor(r))}</div>
-          ${buildGradeRangeTable(r.inCourse, r.desiredGpa)}
-        `;
-        section.appendChild(row);
-      });
-    }
-
-    function handleCalculate(){
-      const cards = Array.from(document.querySelectorAll('#coursesContainer .course-card'));
-      const section = document.getElementById('resultsSection');
-      const downloadBtn = document.getElementById('downloadBtn');
-
-      if (cards.length === 0){
-        section.innerHTML = '<div class="error-box">Add at least one course before calculating.</div>';
-        section.hidden = false;
-        downloadBtn.hidden = true;
-        lastResults = null;
-        return;
-      }
-
-      const errors = [];
-      const results = [];
-
-      cards.forEach(card => {
-        const nameInput = card.querySelector('.course-name');
-        const label = nameInput.value.trim() || 'Untitled Course';
-        const isDirect = card.classList.contains('direct-card');
-
-        if (isDirect){
-          const d = readDirectCard(card);
-          const err = validateDirectInputs(d);
-          if (err) errors.push(`${label}: ${err}`);
-          else results.push({ label, ...computeDirectResult(d) });
-        } else {
-          const d = readCourseCard(card);
-          const err = validateCourseInputs(d);
-          if (err) errors.push(`${label}: ${err}`);
-          else results.push({ label, ...computeResult(d) });
-        }
-      });
-
-      if (errors.length){
-        section.innerHTML = errors.map(e => `<div class="error-box">${escapeHtml(e)}</div>`).join('');
-        section.hidden = false;
-        downloadBtn.hidden = true;
-        lastResults = null;
-        return;
-      }
-
-      lastResults = results;
-      renderResults(results);
-      section.hidden = false;
-      downloadBtn.hidden = false;
-    }
-
-    // ---------- Download as image ----------
-    function showDownloadPopup(){ document.getElementById('downloadPopup').classList.add('active'); }
-    function hideDownloadPopup(){ document.getElementById('downloadPopup').classList.remove('active'); }
-
-    function roundRect(ctx, x, y, w, h, r){
-      ctx.beginPath();
-      ctx.moveTo(x + r, y);
-      ctx.arcTo(x + w, y, x + w, y + h, r);
-      ctx.arcTo(x + w, y + h, x, y + h, r);
-      ctx.arcTo(x, y + h, x, y, r);
-      ctx.arcTo(x, y, x + w, y, r);
-      ctx.closePath();
-    }
-
-    function wrapText(ctx, text, x, y, maxWidth, lineHeight){
-      const words = text.split(' ');
-      let line = '';
-      let curY = y;
-      for (let i = 0; i < words.length; i++){
-        const testLine = line + words[i] + ' ';
-        if (ctx.measureText(testLine).width > maxWidth && i > 0){
-          ctx.fillText(line, x, curY);
-          line = words[i] + ' ';
-          curY += lineHeight;
-        } else {
-          line = testLine;
+        if(userPhoto) userPhoto.style.display = 'none';
+        if(userPhotoFallback){
+          userPhotoFallback.style.display = 'flex';
+          userPhotoFallback.textContent = dName.charAt(0).toUpperCase();
         }
       }
-      ctx.fillText(line, x, curY);
-      return curY + lineHeight;
+      if(userCloudStatus) userCloudStatus.textContent = '● Cloud Connected';
+      loadStudentMarks(user);
+    } else {
+      if(authGuest) authGuest.hidden = false;
+      if(authUser) authUser.hidden = true;
+      if(userDisplayName) userDisplayName.textContent = 'Student';
     }
+  });
 
-    function downloadResultsImage(){
-      if (!lastResults || lastResults.length === 0){
-        alert('Please calculate your results first.');
-        hideDownloadPopup();
-        return;
-      }
+  // ── Init ──
+  function initApp(){
+    populateSemesterSelect();
+    document.getElementById('modeDescText').textContent=MODE_DESC['single'];
+    initSingleMode();
 
-      const width = 800;
-      const headerHeight = 100;
-      const cardHeight = 110;
-      const cardGap = 18;
-      const footerHeight = 50;
-      const height = headerHeight + lastResults.length * (cardHeight + cardGap) + footerHeight + 20;
-
-      const canvas = document.createElement('canvas');
-      canvas.width = width;
-      canvas.height = height;
-      const ctx = canvas.getContext('2d');
-
-      ctx.fillStyle = '#f3f4f8';
-      ctx.fillRect(0, 0, width, height);
-
-      const gradient = ctx.createLinearGradient(0, 0, width, 0);
-      gradient.addColorStop(0, '#5b56e0');
-      gradient.addColorStop(1, '#4541b8');
-      ctx.fillStyle = gradient;
-      ctx.fillRect(0, 0, width, headerHeight);
-
-      ctx.fillStyle = '#ffffff';
-      ctx.textAlign = 'center';
-      ctx.font = 'bold 24px Arial';
-      ctx.fillText('BUP CGPA Calculator', width / 2, 40);
-      ctx.font = '15px Arial';
-      ctx.fillText('Required Final Exam Marks — ' + new Date().toLocaleDateString(), width / 2, 68);
-
-      ctx.textAlign = 'left';
-      let y = headerHeight + 30;
-
-      lastResults.forEach(r => {
-        const cardTop = y - 26;
-        ctx.fillStyle = r.status === 'achieved' ? '#eaf8ef' : (r.status === 'impossible' ? '#fdecec' : '#ffffff');
-        ctx.strokeStyle = '#e3e4ec';
-        ctx.lineWidth = 1;
-        roundRect(ctx, 40, cardTop, width - 80, cardHeight, 10);
-        ctx.fill();
-        ctx.stroke();
-
-        ctx.fillStyle = '#1f2230';
-        ctx.font = 'bold 17px Arial';
-        ctx.fillText(r.label, 60, y);
-
-        ctx.font = '13px Arial';
-        ctx.fillStyle = '#6b7280';
-        ctx.fillText(`Target GPA: ${r.desiredGpa.toFixed(2)}`, 60, y + 20);
-
-        ctx.font = '14px Arial';
-        ctx.fillStyle = r.status === 'achieved' ? '#1f8a4c' : (r.status === 'impossible' ? '#d23c3c' : '#1f2230');
-        wrapText(ctx, messageFor(r), 60, y + 42, width - 140, 18);
-
-        y += cardHeight + cardGap;
-      });
-
-      ctx.fillStyle = '#6b7280';
-      ctx.font = '12px Arial';
-      ctx.textAlign = 'center';
-      ctx.fillText('Generated by BUP CGPA Calculator', width / 2, height - 25);
-
-      const link = document.createElement('a');
-      link.download = 'BUP_CGPA_Results.png';
-      link.href = canvas.toDataURL('image/png');
-      link.click();
-
-      hideDownloadPopup();
-    }
-
-    // ---------- Init ----------
-    document.addEventListener('DOMContentLoaded', () => {
-      populateSemesterSelect();
-      updateModeHint();
-      initSingleMode();
-
-      document.getElementById('semesterSelect').addEventListener('change', loadCoursesForSemester);
-      document.getElementById('modeSingle').addEventListener('change', onModeChange);
-      document.getElementById('modeMultiple').addEventListener('change', onModeChange);
-      document.getElementById('modeDirect').addEventListener('change', onModeChange);
-      document.getElementById('calculateBtn').addEventListener('click', handleCalculate);
-      document.getElementById('downloadBtn').addEventListener('click', showDownloadPopup);
-      document.getElementById('confirmDownloadBtn').addEventListener('click', downloadResultsImage);
-      document.getElementById('cancelDownloadBtn').addEventListener('click', hideDownloadPopup);
-      document.getElementById('downloadPopup').addEventListener('click', (e) => {
-        if (e.target.id === 'downloadPopup') hideDownloadPopup();
-      });
+    document.getElementById('semesterSelect').addEventListener('change',loadCoursesForSemester);
+    document.getElementById('modeSingle').addEventListener('change',onModeChange);
+    document.getElementById('modeMultiple').addEventListener('change',onModeChange);
+    document.getElementById('modeDirect').addEventListener('change',onModeChange);
+    document.getElementById('calculateBtn').addEventListener('click',handleCalculate);
+    document.getElementById('downloadBtn').addEventListener('click',showDownloadPopup);
+    document.getElementById('confirmDownloadBtn').addEventListener('click',downloadResultsImage);
+    document.getElementById('cancelDownloadBtn').addEventListener('click',hideDownloadPopup);
+    document.getElementById('downloadPopup').addEventListener('click',e=>{
+      if(e.target.id==='downloadPopup') hideDownloadPopup();
     });
-  </script>
+
+    // Auth & Cloud Save Listeners
+    document.getElementById('openAuthModalBtn').addEventListener('click',()=>openAuthModal('signIn'));
+    document.getElementById('authCloseBtn').addEventListener('click',closeAuthModal);
+    document.getElementById('authModal').addEventListener('click',e=>{
+      if(e.target.id==='authModal') closeAuthModal();
+    });
+    document.getElementById('tabSignIn').addEventListener('click',()=>switchAuthTab('signIn'));
+    document.getElementById('tabSignUp').addEventListener('click',()=>switchAuthTab('signUp'));
+    document.getElementById('googleSignInBtn').addEventListener('click',handleGoogleSignIn);
+    document.getElementById('authForm').addEventListener('submit',handleAuthSubmit);
+    document.getElementById('forgotPasswordBtn').addEventListener('click',handleForgotPassword);
+    document.getElementById('signOutBtn').addEventListener('click',handleSignOut);
+    document.getElementById('saveMarksBtn').addEventListener('click',saveStudentMarks);
+  }
+
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',initApp);
+  } else {
+    initApp();
+  }
+</script>
 </body>
 </html>
